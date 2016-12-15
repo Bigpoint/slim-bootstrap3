@@ -2,7 +2,7 @@
   "name": "bigpoint/slim-bootstrap3",
   "type": "library",
   "description": "These classes provide a simple way to bootstrap a slim v3 application with authentication.",
-  "homepage" : "https://gitlab.segaja.de/bigpoint/slim-bootstrap3",
+  "homepage" : "https://github.com/bigpoint/slim-bootstrap3",
   "keywords": ["microframework","rest","router","slim"],
   "license" : "Apache-2.0",
   "authors": [
@@ -12,7 +12,7 @@
     }
   ],
   "support" : {
-    "issues" : "https://gitlab.segaja.de/bigpoint/slim-bootstrap3/issues"
+    "issues" : "https://github.com/bigpoint/slim-bootstrap3/issues"
   },
   "require": {
     "php": ">=7.0",

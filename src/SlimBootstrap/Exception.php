@@ -4,8 +4,7 @@ namespace SlimBootstrap;
 use \Monolog;
 
 /**
- * This class represents the basic API exception to be thrown if an error
- * occurs.
+ * This class represents the basic API exception to be thrown if an error occurs.
  *
  * @package SlimBootstrap
  */

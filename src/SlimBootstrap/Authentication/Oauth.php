@@ -6,9 +6,8 @@ use \Monolog;
 use \SlimBootstrap;
 
 /**
- * This class is reponsible for checking if the current user is authenticated
- * to call the API. It does that by validating the token parameter against the
- * given oauth API.
+ * This class is reponsible for checking if the current user is authenticated to call the API.
+ * It does that by validating the token parameter against the given oauth API.
  *
  * @package SlimBootstrap\Authentication
  */

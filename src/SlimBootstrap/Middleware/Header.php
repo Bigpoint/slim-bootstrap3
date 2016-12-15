@@ -4,6 +4,11 @@ namespace SlimBootstrap\Middleware;
 use \Psr\Http\Message;
 use \SlimBootstrap;
 
+/**
+ * Class Header
+ *
+ * @package SlimBootstrap\Middleware
+ */
 class Header implements SlimBootstrap\Middleware
 {
     /**

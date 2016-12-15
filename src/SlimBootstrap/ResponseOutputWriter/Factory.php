@@ -17,24 +17,22 @@ class Factory
     private $csvConfig = [];
 
     /**
-     * An array with the accepted Accept headers and the function name to
-     * create the response object for them.
+     * An array with the accepted Accept headers and the function name to create the response object for them.
      *
      * @var array
      */
-    private $supportedMediaTypes = array(
+    private $supportedMediaTypes = [
         'application/json' => 'createJson',
         'text/csv'         => 'createCsv',
-    );
+    ];
 
     /**
      * Factory constructor.
      *
      * @param array $csvConfig
      */
-    public function __construct(
-        array $csvConfig = []
-    ) {
+    public function __construct(array $csvConfig = [])
+    {
         $this->csvConfig = $csvConfig;
     }
 
@@ -58,8 +56,7 @@ class Factory
 
         /**
          * Loop through accept headers and check if they are supported.
-         * Use first supported accept header and create fitting
-         * ResponseOutputWriter
+         * Use first supported accept header and create fitting ResponseOutputWriter
          */
         foreach ($headers as $header) {
             if (true === \array_key_exists($header, $this->supportedMediaTypes)) {

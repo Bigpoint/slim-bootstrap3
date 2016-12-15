@@ -35,8 +35,7 @@ class Http
      * @param array  $parameters
      * @param array  $additionalHeaders
      * @param bool   $disableCallResultDebugLog
-     * @param int    $logLevelForStatusCode404  Monolog severity values; use
-     *                                          Monolog\Logger::WARNING
+     * @param int    $logLevelForStatusCode404  Monolog severity values; use Monolog\Logger::WARNING
      *
      * @return array
      */
@@ -65,12 +64,10 @@ class Http
 
     /**
      * @param string $url
-     * @param array  $parameters                 assoc array with parameter
-     *                                           or http_build_query string
+     * @param array  $parameters                 assoc array with parameter or http_build_query string
      * @param array  $additionalHeaders
      * @param bool   $disableCallResultDebugLog
-     * @param int    $logLevelForStatusCode404  Monolog severity values;
-     *                                          use Monolog\Logger::WARNING
+     * @param int    $logLevelForStatusCode404  Monolog severity values; use Monolog\Logger::WARNING
      *
      * @return array
      */
@@ -110,8 +107,7 @@ class Http
      * @param array  $parameters
      * @param array  $additionalHeaders
      * @param bool   $disableCallResultDebugLog
-     * @param int    $logLevelForStatusCode404 Monolog severity values; use
-     *                                         Monolog\Logger::WARNING
+     * @param int    $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
      *
      * @return array
      */
@@ -149,8 +145,7 @@ class Http
      * @param string $url
      * @param array  $additionalHeaders
      * @param bool   $disableCallResultDebugLog
-     * @param int    $logLevelForStatusCode404 Monolog severity values; use
-     *                                         Monolog\Logger::WARNING
+     * @param int    $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
      *
      * @return array
      */

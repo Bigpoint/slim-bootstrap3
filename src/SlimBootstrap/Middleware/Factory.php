@@ -4,6 +4,11 @@ namespace SlimBootstrap\Middleware;
 use \Monolog;
 use \SlimBootstrap;
 
+/**
+ * Class Factory
+ *
+ * @package SlimBootstrap\Middleware
+ */
 class Factory
 {
     /**
@@ -36,17 +41,27 @@ class Factory
     }
 
     /**
-     * @param Monolog\Logger                     $logger
-     * @param \SlimBootstrap\Authentication|null $authentication
-     * @param array                              $aclConfig
+     * @param Monolog\Logger                $logger
+     * @param \SlimBootstrap\Authentication $authentication
+     * @param array                         $aclConfig
      *
      * @return \SlimBootstrap\Middleware\Authentication
+     *
+     * @throws SlimBootstrap\Exception
      */
     public function getAuthentication(
         Monolog\Logger $logger,
         SlimBootstrap\Authentication $authentication = null,
-        array $aclConfig = null
+        array $aclConfig = []
     ): SlimBootstrap\Middleware\Authentication {
-        return new SlimBootstrap\Middleware\Authentication($logger, $authentication, $aclConfig);
+        if (false === \is_array($aclConfig)) {
+            throw new SlimBootstrap\Exception('acl config is empty or invalid', 500);
+        }
+
+        return new SlimBootstrap\Middleware\Authentication(
+            $logger,
+            new SlimBootstrap\Acl($aclConfig),
+            $authentication
+        );
     }
 }

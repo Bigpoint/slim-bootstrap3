@@ -5,6 +5,11 @@ use \Monolog;
 use \Psr\Http\Message;
 use \SlimBootstrap;
 
+/**
+ * Class Log
+ *
+ * @package SlimBootstrap\Middleware
+ */
 class Log implements SlimBootstrap\Middleware
 {
     /**

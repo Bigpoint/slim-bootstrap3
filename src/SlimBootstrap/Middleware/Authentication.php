@@ -6,6 +6,11 @@ use \Psr\Http\Message;
 use \SlimBootstrap;
 use \Slim;
 
+/**
+ * Class Authentication
+ *
+ * @package SlimBootstrap\Middleware
+ */
 class Authentication implements SlimBootstrap\Middleware
 {
     /**
@@ -14,13 +19,14 @@ class Authentication implements SlimBootstrap\Middleware
     private $logger = null;
 
     /**
+     * @var SlimBootstrap\Acl
+     */
+    private $acl = null;
+
+    /**
      * @var SlimBootstrap\Authentication
      */
     private $authentication = null;
-    /**
-     * @var array
-     */
-    private $aclConfig = null;
 
     /**
      * Array that defines if the current endpoints wants authentication or not.
@@ -33,17 +39,17 @@ class Authentication implements SlimBootstrap\Middleware
 
     /**
      * @param Monolog\Logger               $logger
+     * @param SlimBootstrap\Acl            $acl
      * @param SlimBootstrap\Authentication $authentication
-     * @param array                        $aclConfig
      */
     public function __construct(
         Monolog\Logger $logger,
-        SlimBootstrap\Authentication $authentication = null,
-        array $aclConfig = null
+        SlimBootstrap\Acl $acl,
+        SlimBootstrap\Authentication $authentication = null
     ) {
         $this->logger         = $logger;
+        $this->acl            = $acl;
         $this->authentication = $authentication;
-        $this->aclConfig      = $aclConfig;
     }
 
     /**
@@ -58,40 +64,43 @@ class Authentication implements SlimBootstrap\Middleware
         Message\ResponseInterface $response,
         callable $next
     ): Message\ResponseInterface {
-        try {
-            // use authentication for API
-            if (null !== $this->authentication) {
-                /** @var Slim\Route $currentRoute */
-                $currentRoute = $request->getAttribute('route');
-                $routeId      = $request->getMethod() . $currentRoute->getPattern();
+        // use authentication for API
+        if (null !== $this->authentication) {
+            /** @var Slim\Route $currentRoute */
+            $currentRoute = $request->getAttribute('route');
+            $routeId      = $request->getMethod() . $currentRoute->getPattern();
 
-                if (true === \array_key_exists($routeId, $this->endpointAuthentication)
-                    && false === $this->endpointAuthentication[$routeId]
-                ) {
-                    return $next($request, $response);
-                }
-
-                if (false === \is_array($this->aclConfig)) {
-                    throw new SlimBootstrap\Exception('acl config is empty or invalid', 500);
-                }
-
-                $this->logger->addInfo('using authentication');
-
-                $clientId = $this->authentication->authenticate($request);
-
-                $this->logger->addInfo('authentication successfull');
-
-                $request = $request->withAttribute('clientId', $clientId);
-
-                $this->logger->addNotice('set clientId to parameter: ' . $clientId);
-                $this->logger->addDebug(\var_export($request->getQueryParams(), true));
-
-                // TODO: acl
+            if (true === \array_key_exists($routeId, $this->endpointAuthentication)
+                && false === $this->endpointAuthentication[$routeId]
+            ) {
+                return $next($request, $response);
             }
-        } catch (SlimBootstrap\Exception $exception) {
-            // TODO
+
+            $this->logger->addInfo('using authentication');
+
+            $clientId = $this->authentication->authenticate($request);
+
+            $this->logger->addInfo('authentication successfull');
+
+            $request = $request->withAttribute('clientId', $clientId);
+
+            $this->logger->addNotice('set clientId to parameter: ' . $clientId);
+            $this->logger->addDebug(\var_export($request->getQueryParams(), true));
+
+            $this->acl->access($clientId, $currentRoute->getName());
+
+            $this->logger->addInfo('access granted');
         }
 
         return $next($request, $response);
+    }
+
+    /**
+     * @param string $routeId
+     * @param bool   $authentication
+     */
+    public function setEndpointAuthentication(string $routeId, bool $authentication)
+    {
+        $this->endpointAuthentication[$routeId] = $authentication;
     }
 }

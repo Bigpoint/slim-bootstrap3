@@ -4,12 +4,22 @@ namespace SlimBootstrap\Middleware;
 use \Psr\Http\Message;
 use \SlimBootstrap;
 
+/**
+ * Class ResponseOutputWriter
+ *
+ * @package SlimBootstrap\Middleware
+ */
 class ResponseOutputWriter implements SlimBootstrap\Middleware
 {
     /**
      * @var SlimBootstrap\ResponseOutputwriter\Factory
      */
     private $responseOutputWriterFactory = null;
+
+    /**
+     * @var SlimBootstrap\ResponseOutputWriter
+     */
+    private $responseOutputWriter = null;
 
     /**
      * ResponseOutputWriter constructor.
@@ -39,5 +49,13 @@ class ResponseOutputWriter implements SlimBootstrap\Middleware
         );
 
         return $next($request, $response);
+    }
+
+    /**
+     * @return SlimBootstrap\ResponseOutputWriter
+     */
+    public function &getResponseOutputWriter(): SlimBootstrap\ResponseOutputWriter
+    {
+        return $this->responseOutputWriter;
     }
 }
