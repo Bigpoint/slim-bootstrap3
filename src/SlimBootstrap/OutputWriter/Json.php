@@ -1,5 +1,5 @@
 <?php
-namespace SlimBootstrap\ResponseOutputWriter;
+namespace SlimBootstrap\OutputWriter;
 
 use Psr\Http\Message;
 use \SlimBootstrap;
@@ -7,9 +7,9 @@ use \SlimBootstrap;
 /**
 * This class is responsible to output the data to the client in valid JSON format.
 *
-* @package SlimBootstrap\ResponseOutputWriter
+* @package SlimBootstrap\OutputWriter
 */
-class Json implements SlimBootstrap\ResponseOutputWriter
+class Json implements SlimBootstrap\OutputWriter
 {
     /**
      * @var Message\ResponseInterface

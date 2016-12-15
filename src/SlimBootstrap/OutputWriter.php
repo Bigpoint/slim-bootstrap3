@@ -8,7 +8,7 @@ use \Psr\Http\Message;
  *
  * @package SlimBootstrap
  */
-interface ResponseOutputWriter
+interface OutputWriter
 {
     /**
      * @param Message\ResponseInterface $response The Slim response instance

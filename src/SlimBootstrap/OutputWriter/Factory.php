@@ -1,5 +1,5 @@
 <?php
-namespace SlimBootstrap\ResponseOutputWriter;
+namespace SlimBootstrap\OutputWriter;
 
 use \Psr\Http\Message;
 use \SlimBootstrap;
@@ -7,7 +7,7 @@ use \SlimBootstrap;
 /**
  * Class Factory
  *
- * @package SlimBootstrap\ResponseOutputWriter
+ * @package SlimBootstrap\OutputWriter
  */
 class Factory
 {
@@ -40,14 +40,14 @@ class Factory
      * @param Message\ResponseInterface $response
      * @param string                    $acceptHeader
      *
-     * @return SlimBootstrap\ResponseOutputWriter
+     * @return SlimBootstrap\OutputWriter
      *
      * @throws SlimBootstrap\Exception
      */
     public function create(
         Message\ResponseInterface $response,
         string $acceptHeader
-    ): SlimBootstrap\ResponseOutputWriter {
+    ): SlimBootstrap\OutputWriter {
         if (null === $acceptHeader) {
             return $this->createJson($response);
         }
@@ -56,7 +56,7 @@ class Factory
 
         /**
          * Loop through accept headers and check if they are supported.
-         * Use first supported accept header and create fitting ResponseOutputWriter
+         * Use first supported accept header and create fitting OutputWriter
          */
         foreach ($headers as $header) {
             if (true === \array_key_exists($header, $this->supportedMediaTypes)) {
@@ -85,13 +85,11 @@ class Factory
      *
      * @param Message\ResponseInterface $response
      *
-     * @return SlimBootstrap\ResponseOutputWriter\Json
+     * @return SlimBootstrap\OutputWriter\Json
      */
-    private function createJson(Message\ResponseInterface $response): SlimBootstrap\ResponseOutputWriter\Json
+    private function createJson(Message\ResponseInterface $response): SlimBootstrap\OutputWriter\Json
     {
-        return new SlimBootstrap\ResponseOutputWriter\Json(
-            $response
-        );
+        return new SlimBootstrap\OutputWriter\Json($response);
     }
 
     /**
@@ -99,13 +97,10 @@ class Factory
      *
      * @param Message\ResponseInterface $response
      *
-     * @return SlimBootstrap\ResponseOutputWriter\Csv
+     * @return SlimBootstrap\OutputWriter\Csv
      */
-    private function createCsv(Message\ResponseInterface $response): SlimBootstrap\ResponseOutputWriter\Csv
+    private function createCsv(Message\ResponseInterface $response): SlimBootstrap\OutputWriter\Csv
     {
-        return new SlimBootstrap\ResponseOutputWriter\Csv(
-            $response,
-            $this->csvConfig
-        );
+        return new SlimBootstrap\OutputWriter\Csv($response, $this->csvConfig);
     }
 }

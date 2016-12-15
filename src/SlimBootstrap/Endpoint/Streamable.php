@@ -11,7 +11,7 @@ use \SlimBootstrap;
 interface Streamable extends SlimBootstrap\Endpoint
 {
     /**
-     * @param SlimBootstrap\ResponseOutputWriter\Streamable $outputWriter
+     * @param SlimBootstrap\OutputWriter\Streamable $outputWriter
      */
-    public function setOutputWriter(SlimBootstrap\ResponseOutputWriter\Streamable $outputWriter);
+    public function setOutputWriter(SlimBootstrap\OutputWriter\Streamable $outputWriter);
 }

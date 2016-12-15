@@ -37,23 +37,12 @@ class Log implements SlimBootstrap\Middleware
         Message\ResponseInterface $response,
         callable $next
     ): Message\ResponseInterface {
-        $this->logger->debug(
-            \sprintf(
-                'Request: %s - %s',
-                $request->getMethod(),
-                $request->getUri()->getPath()
-            )
-        );
+        $this->logger->debug(\sprintf('Request: %s - %s', $request->getMethod(), $request->getUri()->getPath()));
 
         /** @var Message\ResponseInterface $response */
         $response = $next($request, $response);
 
-        $this->logger->debug(
-            \sprintf(
-                'Response status: %s',
-                $response->getStatusCode()
-            )
-        );
+        $this->logger->debug(\sprintf('Response status: %s', $response->getStatusCode()));
 
         return $response;
     }

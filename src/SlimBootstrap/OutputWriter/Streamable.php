@@ -1,12 +1,12 @@
 <?php
-namespace SlimBootstrap\ResponseOutputWriter;
+namespace SlimBootstrap\OutputWriter;
 
 use \Psr\Http\Message;
 
 /**
  * Interface Streamable
  *
- * @package SlimBootstrap\ResponseOutputWriter
+ * @package SlimBootstrap\OutputWriter
  */
 interface Streamable
 {

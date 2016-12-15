@@ -48,9 +48,9 @@ class Bootstrap
     private $app = null;
 
     /**
-     * @var SlimBootstrap\Middleware\ResponseOutputWriter
+     * @var SlimBootstrap\Middleware\OutputWriter
      */
-    private $responseOutputWriterMiddleware = null;
+    private $outputWriterMiddleware = null;
 
     /**
      * @var SlimBootstrap\Middleware\Authentication
@@ -213,10 +213,10 @@ class Bootstrap
     ) {
         $endpoint->setClientId($request->getAttribute('clientId'));
 
-        $outputWriter = &$this->responseOutputWriterMiddleware->getResponseOutputWriter();
+        $outputWriter = &$this->outputWriterMiddleware->getOutputWriter();
 
         if ($endpoint instanceof SlimBootstrap\Endpoint\Streamable) {
-            if ($outputWriter instanceof SlimBootstrap\ResponseOutputWriter\Streamable) {
+            if ($outputWriter instanceof SlimBootstrap\OutputWriter\Streamable) {
                 $endpoint->setOutputWriter($outputWriter);
 
                 \ob_start();
@@ -244,28 +244,26 @@ class Bootstrap
      */
     private function registerMiddlewares(Slim\App $app, Monolog\Logger $logger)
     {
-        $logMiddleware                        = $this->middlewareFactory->getLog($logger);
-        $headerMiddleware                     = $this->middlewareFactory->getHeader();
-        $this->responseOutputWriterMiddleware = $this->middlewareFactory->getResponseOutputWriter(
-            $this->createResponseOutputWriterFactory()
-        );
-        $this->authenticationMiddleware       = $this->middlewareFactory->getAuthentication(
+        $logMiddleware                  = $this->middlewareFactory->getLog($logger);
+        $headerMiddleware               = $this->middlewareFactory->getHeader();
+        $this->outputWriterMiddleware   = $this->middlewareFactory->getOutputWriter($this->createOutputWriterFactory());
+        $this->authenticationMiddleware = $this->middlewareFactory->getAuthentication(
             $logger,
             $this->authentication,
             $this->aclConfig
         );
 
         $app->add([$this->authenticationMiddleware, 'execute']);
-        $app->add([$this->responseOutputWriterMiddleware, 'execute']);
+        $app->add([$this->outputWriterMiddleware, 'execute']);
         $app->add(new Slim\HttpCache\Cache('public', $this->applicationConfig['cacheDuration']));
         $app->add([$headerMiddleware, 'execute']);
         $app->add([$logMiddleware, 'execute']);
     }
 
     /**
-     * @return SlimBootstrap\ResponseOutputwriter\Factory
+     * @return SlimBootstrap\Outputwriter\Factory
      */
-    private function createResponseOutputWriterFactory(): SlimBootstrap\ResponseOutputwriter\Factory
+    private function createOutputWriterFactory(): SlimBootstrap\Outputwriter\Factory
     {
         $csvConfig = [];
 
@@ -275,6 +273,6 @@ class Bootstrap
             $csvConfig = $this->applicationConfig['csv'];
         }
 
-        return new SlimBootstrap\ResponseOutputwriter\Factory($csvConfig);
+        return new SlimBootstrap\Outputwriter\Factory($csvConfig);
     }
 }

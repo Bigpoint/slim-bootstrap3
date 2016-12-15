@@ -30,14 +30,14 @@ class Factory
     }
 
     /**
-     * @param SlimBootstrap\ResponseOutputwriter\Factory $responseOutputWriterFactory
+     * @param SlimBootstrap\Outputwriter\Factory $outputWriterFactory
      *
-     * @return SlimBootstrap\Middleware\ResponseOutputWriter
+     * @return SlimBootstrap\Middleware\OutputWriter
      */
-    public function getResponseOutputWriter(
-        SlimBootstrap\ResponseOutputwriter\Factory $responseOutputWriterFactory
-    ): SlimBootstrap\Middleware\ResponseOutputWriter {
-        return new SlimBootstrap\Middleware\ResponseOutputWriter($responseOutputWriterFactory);
+    public function getOutputWriter(
+        SlimBootstrap\Outputwriter\Factory $outputWriterFactory
+    ): SlimBootstrap\Middleware\OutputWriter {
+        return new SlimBootstrap\Middleware\OutputWriter($outputWriterFactory);
     }
 
     /**
