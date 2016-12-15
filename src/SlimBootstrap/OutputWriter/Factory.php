@@ -1,8 +1,8 @@
 <?php
 namespace SlimBootstrap\OutputWriter;
 
-use \Psr\Http\Message;
 use \SlimBootstrap;
+use \Slim;
 
 /**
  * Class Factory
@@ -37,15 +37,15 @@ class Factory
     }
 
     /**
-     * @param Message\ResponseInterface $response
-     * @param string                    $acceptHeader
+     * @param Slim\Http\Response $response
+     * @param string             $acceptHeader
      *
      * @return SlimBootstrap\OutputWriter
      *
      * @throws SlimBootstrap\Exception
      */
     public function create(
-        Message\ResponseInterface $response,
+        Slim\Http\Response $response,
         string $acceptHeader
     ): SlimBootstrap\OutputWriter {
         if (null === $acceptHeader) {
@@ -83,11 +83,11 @@ class Factory
     /**
      * This function creates a Json reponse object.
      *
-     * @param Message\ResponseInterface $response
+     * @param Slim\Http\Response $response
      *
      * @return SlimBootstrap\OutputWriter\Json
      */
-    private function createJson(Message\ResponseInterface $response): SlimBootstrap\OutputWriter\Json
+    private function createJson(Slim\Http\Response $response): SlimBootstrap\OutputWriter\Json
     {
         return new SlimBootstrap\OutputWriter\Json($response);
     }
@@ -95,11 +95,11 @@ class Factory
     /**
      * This function creates a Csv reponse object.
      *
-     * @param Message\ResponseInterface $response
+     * @param Slim\Http\Response $response
      *
      * @return SlimBootstrap\OutputWriter\Csv
      */
-    private function createCsv(Message\ResponseInterface $response): SlimBootstrap\OutputWriter\Csv
+    private function createCsv(Slim\Http\Response $response): SlimBootstrap\OutputWriter\Csv
     {
         return new SlimBootstrap\OutputWriter\Csv($response, $this->csvConfig);
     }

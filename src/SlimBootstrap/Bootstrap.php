@@ -14,6 +14,8 @@ use \Slim;
  * @todo:
  *  - SlimBootstrap\Endpoint\ForceDefaultMimeType
  *  - mimetype handling
+ *  - outputWriter as middleware?
+ *  - Response is \Psr\Http\Message\StreamInterface
  */
 class Bootstrap
 {
@@ -101,12 +103,13 @@ class Bootstrap
         $container['errorHandler'] = function ($container) {
             return function (
                 Message\ServerRequestInterface $request,
-                Message\ResponseInterface $response,
+                Slim\Http\Response $response,
                 SlimBootstrap\Exception $exception
             ) use ($container): Message\ResponseInterface {
-                return $response
-                    ->withStatus($exception->getLogLevel())
-                    ->write($exception->getMessage());
+                $response = $response->withStatus($exception->getLogLevel());
+                $response->getBody()->write($exception->getMessage());
+
+                return $response;
             };
         };
 
@@ -169,7 +172,7 @@ class Bootstrap
             $route,
             function (
                 Message\ServerRequestInterface $request,
-                Message\ResponseInterface $response,
+                Slim\Http\Response $response,
                 array $args
             ) use ($endpoint, $type) {
                 $this->handleEndpointCall($endpoint, $type, $request, $args);

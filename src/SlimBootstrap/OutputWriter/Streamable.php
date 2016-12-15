@@ -1,7 +1,7 @@
 <?php
 namespace SlimBootstrap\OutputWriter;
 
-use \Psr\Http\Message;
+use \Slim;
 
 /**
  * Interface Streamable
@@ -11,9 +11,9 @@ use \Psr\Http\Message;
 interface Streamable
 {
     /**
-     * @param Message\ResponseInterface $response The Slim response instance
+     * @param Slim\Http\Response $response The Slim response instance
      */
-    public function __construct(Message\ResponseInterface $response);
+    public function __construct(Slim\Http\Response $response);
 
     /**
      * @param array $data

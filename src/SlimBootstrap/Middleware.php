@@ -2,6 +2,7 @@
 namespace SlimBootstrap;
 
 use \Psr\Http\Message;
+use \Slim;
 
 /**
  * Interface Middleware
@@ -12,14 +13,14 @@ interface Middleware
 {
     /**
      * @param Message\ServerRequestInterface $request
-     * @param Message\ResponseInterface      $response
+     * @param Slim\Http\Response             $response
      * @param callable                       $next
      *
      * @return Message\ResponseInterface
      */
     public function execute(
         Message\ServerRequestInterface $request,
-        Message\ResponseInterface $response,
+        Slim\Http\Response $response,
         callable $next
     ): Message\ResponseInterface;
 }

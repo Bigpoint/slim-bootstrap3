@@ -1,8 +1,8 @@
 <?php
 namespace SlimBootstrap\OutputWriter;
 
-use Psr\Http\Message;
 use \SlimBootstrap;
+use \Slim;
 
 /**
 * This class is responsible to output the data to the client in valid JSON format.
@@ -12,16 +12,16 @@ use \SlimBootstrap;
 class Json implements SlimBootstrap\OutputWriter
 {
     /**
-     * @var Message\ResponseInterface
+     * @var Slim\Http\Response
      */
     private $response = null;
 
     /**
      * Json constructor.
      *
-     * @param Message\ResponseInterface $response
+     * @param Slim\Http\Response $response
      */
-    public function __construct(Message\ResponseInterface $response)
+    public function __construct(Slim\Http\Response $response)
     {
         $this->response = $response;
     }
@@ -32,6 +32,6 @@ class Json implements SlimBootstrap\OutputWriter
      */
     public function write(array $data, int $statusCode = 200)
     {
-        // TODO: Implement write() method.
+        $this->response = $this->response->withJson($data, $statusCode);
     }
 }

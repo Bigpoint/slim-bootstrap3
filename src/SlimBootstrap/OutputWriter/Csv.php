@@ -1,8 +1,8 @@
 <?php
 namespace SlimBootstrap\OutputWriter;
 
-use Psr\Http\Message;
 use \SlimBootstrap;
+use \Slim;
 
 /**
 * This class is responsible to output the data to the client in valid CSV format.
@@ -12,14 +12,14 @@ use \SlimBootstrap;
 class Csv implements SlimBootstrap\OutputWriter
 {
     /**
-     * @var Message\ResponseInterface
+     * @var Slim\Http\Response
      */
     private $response = null;
 
     /**
-     * @param Message\ResponseInterface $response
+     * @param Slim\Http\Response $response
      */
-    public function __construct(Message\ResponseInterface $response)
+    public function __construct(Slim\Http\Response $response)
     {
         $this->response = $response;
     }

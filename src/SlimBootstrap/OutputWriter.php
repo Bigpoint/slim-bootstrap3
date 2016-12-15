@@ -1,7 +1,7 @@
 <?php
 namespace SlimBootstrap;
 
-use \Psr\Http\Message;
+use \Slim;
 
 /**
  * This interface represents the basic structure of all response classes.
@@ -11,9 +11,9 @@ use \Psr\Http\Message;
 interface OutputWriter
 {
     /**
-     * @param Message\ResponseInterface $response The Slim response instance
+     * @param Slim\Http\Response $response The Slim response instance
      */
-    public function __construct(Message\ResponseInterface $response);
+    public function __construct(Slim\Http\Response $response);
 
     /**
      * This method is called to output the passed $data with the given $statusCode.

@@ -4,6 +4,7 @@ namespace SlimBootstrap\Middleware;
 use \Monolog;
 use \Psr\Http\Message;
 use \SlimBootstrap;
+use \Slim;
 
 /**
  * Class Log
@@ -27,14 +28,14 @@ class Log implements SlimBootstrap\Middleware
 
     /**
      * @param Message\ServerRequestInterface $request
-     * @param Message\ResponseInterface      $response
+     * @param Slim\Http\Response             $response
      * @param callable                       $next
      *
      * @return Message\ResponseInterface
      */
     public function execute(
         Message\ServerRequestInterface $request,
-        Message\ResponseInterface $response,
+        Slim\Http\Response $response,
         callable $next
     ): Message\ResponseInterface {
         $this->logger->debug(\sprintf('Request: %s - %s', $request->getMethod(), $request->getUri()->getPath()));
