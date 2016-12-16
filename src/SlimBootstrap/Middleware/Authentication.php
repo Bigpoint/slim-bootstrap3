@@ -92,7 +92,7 @@ class Authentication implements SlimBootstrap\Middleware
             $this->logger->addInfo('access granted');
         }
 
-        return $next($request, $response);
+        return$newResponse = $next($request, $response);
     }
 
     /**

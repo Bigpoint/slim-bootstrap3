@@ -11,15 +11,13 @@ use \Slim;
 interface OutputWriter
 {
     /**
-     * @param Slim\Http\Response $response The Slim response instance
-     */
-    public function __construct(Slim\Http\Response $response);
-
-    /**
      * This method is called to output the passed $data with the given $statusCode.
      *
-     * @param array $data       The actual data to output
-     * @param int   $statusCode The HTTP status code to return
+     * @param Slim\Http\Response $response
+     * @param array              $data       The actual data to output
+     * @param int                $statusCode The HTTP status code to return
+     *
+     * @return Slim\Http\Response
      */
-    public function write(array $data, int $statusCode = 200);
+    public function write(Slim\Http\Response $response, array $data, int $statusCode = 200): Slim\Http\Response;
 }

@@ -30,14 +30,13 @@ class Factory
     }
 
     /**
-     * @param SlimBootstrap\Outputwriter\Factory $outputWriterFactory
+     * @param array $csvConfig
      *
      * @return SlimBootstrap\Middleware\OutputWriter
      */
-    public function getOutputWriter(
-        SlimBootstrap\Outputwriter\Factory $outputWriterFactory
-    ): SlimBootstrap\Middleware\OutputWriter {
-        return new SlimBootstrap\Middleware\OutputWriter($outputWriterFactory);
+    public function getOutputWriter(array $csvConfig): SlimBootstrap\Middleware\OutputWriter
+    {
+        return new SlimBootstrap\Middleware\OutputWriter($csvConfig);
     }
 
     /**

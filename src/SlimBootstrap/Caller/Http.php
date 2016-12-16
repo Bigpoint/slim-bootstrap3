@@ -185,7 +185,7 @@ class Http
     private function createCurlHandler(
         string $url,
         array $additionalHeaders
-    ): resource {
+    ) {
         $curlHandler = \curl_init();
 
         \curl_setopt_array(
@@ -195,7 +195,7 @@ class Http
                 CURLOPT_HEADER         => false,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_SSL_VERIFYHOST => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $this->connectionTimeout,
                 CURLOPT_FOLLOWLOCATION => true,
             )
@@ -241,7 +241,7 @@ class Http
      * @return array
      */
     private function executeCurl(
-        resource $curlHandler,
+        $curlHandler,
         string $url,
         bool $disableCallResultDebugLog,
         int $logLevelForStatusCode404

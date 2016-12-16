@@ -12,26 +12,26 @@ use \Slim;
 class Json implements SlimBootstrap\OutputWriter
 {
     /**
-     * @var Slim\Http\Response
-     */
-    private $response = null;
-
-    /**
-     * Json constructor.
-     *
      * @param Slim\Http\Response $response
+     * @param array              $data
+     * @param int                $statusCode
+     *
+     * @return Slim\Http\Response
      */
-    public function __construct(Slim\Http\Response $response)
+    public function write(Slim\Http\Response $response, array $data, int $statusCode = 300): Slim\Http\Response
     {
-        $this->response = $response;
+        return $response->withJson($data, $statusCode);
     }
 
     /**
      * @param array $data
-     * @param int   $statusCode
+     *
+     * @return string
+     *
+     * @codeCoverageIgnore
      */
-    public function write(array $data, int $statusCode = 200)
+    protected function jsonEncode(array $data): string
     {
-        $this->response = $this->response->withJson($data, $statusCode);
+        return \json_encode($data);
     }
 }

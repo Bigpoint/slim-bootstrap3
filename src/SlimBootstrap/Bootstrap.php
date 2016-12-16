@@ -106,10 +106,36 @@ class Bootstrap
                 Slim\Http\Response $response,
                 SlimBootstrap\Exception $exception
             ) use ($container): Message\ResponseInterface {
-                $response = $response->withStatus($exception->getLogLevel());
-                $response->getBody()->write($exception->getMessage());
+                $container->logger->addRecord(
+                    $exception->getLogLevel(),
+                    \sprintf('%d - %s', $exception->getCode(), $exception->getMessage())
+                );
+
+                /** @var Slim\Http\Response $response */
+                $response = $response->withStatus($exception->getCode());
+                $response->write($exception->getMessage());
 
                 return $response;
+            };
+        };
+
+        // add endpoint handler
+        $container['endpointHandler'] = function ($container) {
+            return function (
+                SlimBootstrap\Endpoint $endpoint,
+                string $type,
+                Message\ServerRequestInterface $request,
+                Slim\Http\Response $response,
+                array $args
+            ): Slim\Http\Response {
+                $endpoint->setClientId($request->getAttribute('clientId'));
+
+                $data = $endpoint->$type($args);
+
+                $outputWriter = $request->getAttribute('outputWriter');
+                $res = $outputWriter->write($response, $data);
+
+                return $res;
             };
         };
 
@@ -137,14 +163,16 @@ class Bootstrap
 
         $this->authenticationMiddleware->setEndpointAuthentication(\strtoupper($type) . $route, $authentication);
 
-        $this->app->$type(
+        $this->app->any(
             $route,
             function (
                 Message\ServerRequestInterface $request,
                 Message\ResponseInterface $response,
                 array $args
-            ) use ($endpoint, $type) {
-                $this->handleEndpointCall($endpoint, $type, $request, $args);
+            ) use ($endpoint, $type): Slim\Http\Response {
+                /** @var Slim\Container $this */
+                $endpointHandler = $this->get('endpointHandler');
+                return $endpointHandler($endpoint, $type, $request, $response, $request->getQueryParams());
             }
         )->setName($name);
     }
@@ -174,8 +202,10 @@ class Bootstrap
                 Message\ServerRequestInterface $request,
                 Slim\Http\Response $response,
                 array $args
-            ) use ($endpoint, $type) {
-                $this->handleEndpointCall($endpoint, $type, $request, $args);
+            ) use ($endpoint, $type): Slim\Http\Response {
+                /** @var Slim\Container $this */
+                $endpointHandler = $this->get('endpointHandler');
+                return $endpointHandler($endpoint, $type, $request, $response, $args);
             }
         )->setName($name);
     }
@@ -201,45 +231,6 @@ class Bootstrap
     }
 
     /**
-     * @param SlimBootstrap\Endpoint         $endpoint
-     * @param string                         $type
-     * @param Message\ServerRequestInterface $request
-     * @param array                          $args
-     *
-     * @throws SlimBootstrap\Exception
-     */
-    private function handleEndpointCall(
-        SlimBootstrap\Endpoint $endpoint,
-        string $type,
-        Message\ServerRequestInterface $request,
-        array $args
-    ) {
-        $endpoint->setClientId($request->getAttribute('clientId'));
-
-        $outputWriter = &$this->outputWriterMiddleware->getOutputWriter();
-
-        if ($endpoint instanceof SlimBootstrap\Endpoint\Streamable) {
-            if ($outputWriter instanceof SlimBootstrap\OutputWriter\Streamable) {
-                $endpoint->setOutputWriter($outputWriter);
-
-                \ob_start();
-                $endpoint->$type($args);
-                \ob_end_clean();
-            } else {
-                throw new SlimBootstrap\Exception(
-                    'media type does not support streaming',
-                    406,
-                    Monolog\Logger::WARNING
-                );
-            }
-        } else {
-            $data = $endpoint->$type($args);
-
-            $outputWriter->write($data);
-        }
-    }
-
-    /**
      * Register middlewares (last in first executed).
      *
      * @param \Slim\App       $app
@@ -247,35 +238,26 @@ class Bootstrap
      */
     private function registerMiddlewares(Slim\App $app, Monolog\Logger $logger)
     {
-        $logMiddleware                  = $this->middlewareFactory->getLog($logger);
-        $headerMiddleware               = $this->middlewareFactory->getHeader();
-        $this->outputWriterMiddleware   = $this->middlewareFactory->getOutputWriter($this->createOutputWriterFactory());
-        $this->authenticationMiddleware = $this->middlewareFactory->getAuthentication(
-            $logger,
-            $this->authentication,
-            $this->aclConfig
-        );
-
-        $app->add([$this->authenticationMiddleware, 'execute']);
-        $app->add([$this->outputWriterMiddleware, 'execute']);
-        $app->add(new Slim\HttpCache\Cache('public', $this->applicationConfig['cacheDuration']));
-        $app->add([$headerMiddleware, 'execute']);
-        $app->add([$logMiddleware, 'execute']);
-    }
-
-    /**
-     * @return SlimBootstrap\Outputwriter\Factory
-     */
-    private function createOutputWriterFactory(): SlimBootstrap\Outputwriter\Factory
-    {
         $csvConfig = [];
-
         if (true === \array_key_exists('csv', $this->applicationConfig)
             && true === \is_array($this->applicationConfig['csv'])
         ) {
             $csvConfig = $this->applicationConfig['csv'];
         }
 
-        return new SlimBootstrap\Outputwriter\Factory($csvConfig);
+        $logMiddleware                  = $this->middlewareFactory->getLog($logger);
+        $headerMiddleware               = $this->middlewareFactory->getHeader();
+        $this->outputWriterMiddleware   = $this->middlewareFactory->getOutputWriter($csvConfig);
+        $this->authenticationMiddleware = $this->middlewareFactory->getAuthentication(
+            $logger,
+            $this->authentication,
+            $this->aclConfig
+        );
+
+        $app->add([$this->outputWriterMiddleware, 'execute']);
+        $app->add([$this->authenticationMiddleware, 'execute']);
+        $app->add(new Slim\HttpCache\Cache('public', $this->applicationConfig['cacheDuration']));
+        $app->add([$headerMiddleware, 'execute']);
+        $app->add([$logMiddleware, 'execute']);
     }
 }

@@ -13,21 +13,26 @@ use \Slim;
 class OutputWriter implements SlimBootstrap\Middleware
 {
     /**
-     * @var SlimBootstrap\Outputwriter\Factory
+     * An array with the accepted Accept headers and the function name to create the response object for them.
+     *
+     * @var array
      */
-    private $outputWriterFactory = null;
+    private $supportedMediaTypes = [
+        'application/json' => 'createJson',
+        'text/csv'         => 'createCsv',
+    ];
 
     /**
-     * @var SlimBootstrap\OutputWriter
+     * @var array
      */
-    private $outputWriter = null;
+    private $csvConfig = [];
 
     /**
-     * @param SlimBootstrap\Outputwriter\Factory $outputWriterFactory
+     * @param array $csvConfig
      */
-    public function __construct(SlimBootstrap\Outputwriter\Factory $outputWriterFactory)
+    public function __construct(array $csvConfig)
     {
-        $this->outputWriterFactory = $outputWriterFactory;
+        $this->csvConfig = $csvConfig;
     }
 
     /**
@@ -42,16 +47,72 @@ class OutputWriter implements SlimBootstrap\Middleware
         Slim\Http\Response $response,
         callable $next
     ): Message\ResponseInterface {
-        $this->outputWriter = $this->outputWriterFactory->create($response, $request->getHeader('Accept'));
+        $request = $request->withAttribute(
+            'outputWriter',
+            $this->determineOutputWriter($request->getHeaderLine('Accept'))
+        );
 
         return $next($request, $response);
     }
 
     /**
+     * @param string $acceptHeader
+     *
      * @return SlimBootstrap\OutputWriter
+     *
+     * @throws SlimBootstrap\Exception
      */
-    public function &getOutputWriter(): SlimBootstrap\OutputWriter
+    private function determineOutputWriter(string $acceptHeader): SlimBootstrap\OutputWriter
     {
-        return $this->outputWriter;
+        if (null === $acceptHeader) {
+            return $this->createJson();
+        }
+
+        $headers = \preg_split('/[,;]/', $acceptHeader);
+
+        /**
+         * Loop through accept headers and check if they are supported.
+         * Use first supported accept header and create fitting OutputWriter
+         */
+        foreach ($headers as $header) {
+            if (true === \array_key_exists($header, $this->supportedMediaTypes)) {
+                $function = $this->supportedMediaTypes[$header];
+                $instance = $this->$function();
+
+                return $instance;
+            }
+        }
+
+        if (true === \in_array('application/*', $headers)
+            || \in_array('*/*', $headers)
+        ) {
+            return $this->createJson();
+        }
+
+        throw new SlimBootstrap\Exception(
+            'media type not supported (supported media types: '
+            . \implode(', ', \array_keys($this->supportedMediaTypes)) .  ')',
+            406
+        );
+    }
+
+    /**
+     * This function creates a Json reponse object.
+     *
+     * @return SlimBootstrap\OutputWriter\Json
+     */
+    private function createJson(): SlimBootstrap\OutputWriter\Json
+    {
+        return new SlimBootstrap\OutputWriter\Json();
+    }
+
+    /**
+     * This function creates a Csv reponse object.
+     *
+     * @return SlimBootstrap\OutputWriter\Csv
+     */
+    private function createCsv(): SlimBootstrap\OutputWriter\Csv
+    {
+        return new SlimBootstrap\OutputWriter\Csv($this->csvConfig);
     }
 }

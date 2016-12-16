@@ -11,9 +11,9 @@ use \SlimBootstrap;
 interface CollectionGet extends SlimBootstrap\Endpoint
 {
     /**
-     * @param array $args
+     * @param array $filters
      *
      * @return array
      */
-    public function get(array $args): array;
+    public function get(array $filters): array;
 }

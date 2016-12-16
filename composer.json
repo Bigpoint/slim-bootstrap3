@@ -28,7 +28,7 @@
   },
   "autoload": {
     "psr-4": {
-      "SlimBootstrap\\": ["src/", "tests/"]
+      "SlimBootstrap\\": ["src/SlimBootstrap/"]
     }
   }
 }

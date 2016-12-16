@@ -64,7 +64,7 @@ class Oauth implements SlimBootstrap\Authentication
                 'Accept: application/json',
             ]
         );
-        $result = \json_decode($result, true);
+        $result = \json_decode($result['body'], true);
 
         if (false === \is_array($result)
             || false === \array_key_exists('entity_id', $result)
