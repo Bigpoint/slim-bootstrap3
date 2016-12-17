@@ -128,7 +128,11 @@ class Bootstrap
                 Slim\Http\Response $response,
                 array $args
             ): Slim\Http\Response {
-                $endpoint->setClientId($request->getAttribute('clientId'));
+                $clientId = $request->getAttribute('clientId');
+
+                if (true === \is_string($clientId)) {
+                    $endpoint->setClientId($clientId);
+                }
 
                 $data = $endpoint->$type($args);
 
