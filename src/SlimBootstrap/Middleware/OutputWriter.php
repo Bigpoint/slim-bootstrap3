@@ -19,7 +19,6 @@ class OutputWriter implements SlimBootstrap\Middleware
      */
     private $supportedMediaTypes = [
         'application/json' => 'createJson',
-        'text/csv'         => 'createCsv',
     ];
 
     /**
@@ -104,15 +103,5 @@ class OutputWriter implements SlimBootstrap\Middleware
     private function createJson(): SlimBootstrap\OutputWriter\Json
     {
         return new SlimBootstrap\OutputWriter\Json();
-    }
-
-    /**
-     * This function creates a Csv reponse object.
-     *
-     * @return SlimBootstrap\OutputWriter\Csv
-     */
-    private function createCsv(): SlimBootstrap\OutputWriter\Csv
-    {
-        return new SlimBootstrap\OutputWriter\Csv($this->csvConfig);
     }
 }
