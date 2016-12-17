@@ -18,20 +18,8 @@ class Json implements SlimBootstrap\OutputWriter
      *
      * @return Slim\Http\Response
      */
-    public function write(Slim\Http\Response $response, array $data, int $statusCode = 300): Slim\Http\Response
+    public function write(Slim\Http\Response $response, array $data, int $statusCode = 200): Slim\Http\Response
     {
         return $response->withJson($data, $statusCode);
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return string
-     *
-     * @codeCoverageIgnore
-     */
-    protected function jsonEncode(array $data): string
-    {
-        return \json_encode($data);
     }
 }
