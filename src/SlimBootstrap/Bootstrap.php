@@ -104,15 +104,22 @@ class Bootstrap
             return function (
                 Message\ServerRequestInterface $request,
                 Slim\Http\Response $response,
-                SlimBootstrap\Exception $exception
+                \Exception $exception
             ) use ($container): Message\ResponseInterface {
+                $code     = 500;
+                $logLevel = Monolog\Logger::ERROR;
+                if ($exception instanceof SlimBootstrap\Exception) {
+                    $code     = $exception->getCode();
+                    $logLevel = $exception->getLogLevel();
+                }
+
                 $container->logger->addRecord(
-                    $exception->getLogLevel(),
+                    $logLevel,
                     \sprintf('%d - %s', $exception->getCode(), $exception->getMessage())
                 );
 
                 /** @var Slim\Http\Response $response */
-                $response = $response->withStatus($exception->getCode());
+                $response = $response->withStatus($code);
                 $response->write($exception->getMessage());
 
                 return $response;

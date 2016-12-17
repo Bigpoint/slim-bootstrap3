@@ -54,4 +54,14 @@ class Factory
             $this->logger
         );
     }
+
+    public function createJwt(): SlimBootstrap\Authentication\Jwt
+    {
+        return new SlimBootstrap\Authentication\Jwt(
+            $this->config['providerUrl'],
+            $this->config['claims'],
+            $this->httpCaller,
+            $this->logger
+        );
+    }
 }
