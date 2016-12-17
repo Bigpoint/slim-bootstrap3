@@ -163,7 +163,7 @@ class Bootstrap
 
         $this->authenticationMiddleware->setEndpointAuthentication(\strtoupper($type) . $route, $authentication);
 
-        $this->app->any(
+        $this->app->$type(
             $route,
             function (
                 Message\ServerRequestInterface $request,
