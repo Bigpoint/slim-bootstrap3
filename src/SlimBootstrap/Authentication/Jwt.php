@@ -29,13 +29,6 @@ class Jwt implements SlimBootstrap\Authentication
     private $logger = null;
 
     /**
-     * @TODO: get from jwt-provider.
-     *
-     * @var string
-     */
-    private $publicKey = "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElAfxdt6MZxXc4TsZROhm8QPnoDm5\nILVK9el6kU9xd+3Pnb3yOBsLTnuX9/x2c8HIQIoxEs8IlreBQndy3CvRJQ==\n-----END PUBLIC KEY-----\n";
-
-    /**
      * @param string                    $providerUrl
      * @param array                     $claimsConfig
      * @param SlimBootstrap\Caller\Http $httpCaller
@@ -64,9 +57,10 @@ class Jwt implements SlimBootstrap\Authentication
     public function authenticate(Message\ServerRequestInterface $request): string
     {
         try {
-            $token = $this->getToken($request);
+            $publicKey = $this->getPublicKey();
+            $token     = $this->getToken($request);
 
-            $this->verifyToken($token);
+            $this->verifyToken($token, $publicKey);
             $this->validateToken($token);
 
             var_dump('Name: ' . $token->getClaim('name'));
@@ -78,6 +72,49 @@ class Jwt implements SlimBootstrap\Authentication
         }
 
         die;
+    }
+
+    /**
+     * @return string
+     *
+     * @throws SlimBootstrap\Exception
+     */
+    private function getPublicKey(): string
+    {
+        $result = $this->httpCaller->get(
+            $this->providerUrl
+        );
+
+        if (200 !== $result['responseCode']) {
+            throw new SlimBootstrap\Exception(
+                \sprintf(
+                    'provider returned invalid response: %s - %s',
+                    $result['responseCode'],
+                    \var_export($result['body'], true)
+                ),
+                401,
+                Monolog\Logger::ERROR
+            );
+        }
+
+        $data = \json_decode($result['body'], true);
+
+        if (false === \is_array($data)
+            || false === \array_key_exists('Pubkey', $data)
+            || true === empty($data['Pubkey'])
+        ) {
+            throw new SlimBootstrap\Exception(
+                \sprintf(
+                    'provider returned invalid result: %s - %s',
+                    $result['responseCode'],
+                    \var_export($result['body'], true)
+                ),
+                401,
+                Monolog\Logger::ERROR
+            );
+        }
+
+        return $data['Pubkey'];
     }
 
     /**
@@ -98,10 +135,10 @@ class Jwt implements SlimBootstrap\Authentication
      *
      * @throws SlimBootstrap\Exception
      */
-    private function verifyToken(Lcobucci\JWT\Token $token)
+    private function verifyToken(Lcobucci\JWT\Token $token, string $publicKey)
     {
         $signer = new Lcobucci\JWT\Signer\Ecdsa\Sha256();
-        $result = $token->verify($signer, $this->publicKey);
+        $result = $token->verify($signer, $publicKey);
 
         if (false === $result) {
             throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
