@@ -217,6 +217,11 @@ class Http
     {
         $urlData         = \parse_url($url);
         $queryStringData = [];
+
+        if (false === \array_key_exists('query', $urlData)) {
+            return $url;
+        }
+
         $oldQueryString  = $urlData['query'];
 
         \parse_str($urlData['query'], $queryStringData);

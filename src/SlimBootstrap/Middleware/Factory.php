@@ -3,6 +3,7 @@ namespace SlimBootstrap\Middleware;
 
 use \Monolog;
 use \SlimBootstrap;
+use \Slim;
 
 /**
  * Class Factory
@@ -62,5 +63,15 @@ class Factory
             new SlimBootstrap\Acl($aclConfig),
             $authentication
         );
+    }
+
+    /**
+     * @param int $cacheDuration
+     *
+     * @return Slim\HttpCache\Cache
+     */
+    public function getCache(int $cacheDuration): Slim\HttpCache\Cache
+    {
+        return new Slim\HttpCache\Cache('public', $cacheDuration);
     }
 }
