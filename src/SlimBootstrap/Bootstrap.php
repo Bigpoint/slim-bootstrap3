@@ -14,7 +14,6 @@ use \Slim;
  * @todo:
  *  - SlimBootstrap\Endpoint\ForceDefaultMimeType
  *  - mimetype handling
- *  - outputWriter as middleware?
  *  - Response is \Psr\Http\Message\StreamInterface
  */
 class Bootstrap
@@ -118,11 +117,9 @@ class Bootstrap
                     \sprintf('%d - %s', $exception->getCode(), $exception->getMessage())
                 );
 
-                /** @var Slim\Http\Response $response */
-                $response = $response->withStatus($code);
-                $response->write($exception->getMessage());
-
-                return $response;
+                return $response->withStatus($code)
+                    ->withHeader('Content-Type', 'text/html')
+                    ->write($exception->getMessage());
             };
         };
 
@@ -267,7 +264,7 @@ class Bootstrap
 
         $app->add([$this->outputWriterMiddleware, 'execute']);
         $app->add([$this->authenticationMiddleware, 'execute']);
-        $app->add(new Slim\HttpCache\Cache('public', $this->applicationConfig['cacheDuration']));
+        $app->add($this->middlewareFactory->getCache($this->applicationConfig['cacheDuration']));
         $app->add([$headerMiddleware, 'execute']);
         $app->add([$logMiddleware, 'execute']);
     }
