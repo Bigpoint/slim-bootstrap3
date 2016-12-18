@@ -26,6 +26,14 @@ class Acl
     }
 
     /**
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
      * Checks if the given $clientId is allowed to access the given $endpointName.
      *
      * @param string $clientId     The clientId which wants access to the endpoint
@@ -45,6 +53,17 @@ class Acl
 
         $role = $this->config['access'][$clientId];
 
+        $this->accessRole($role, $endpointName);
+    }
+
+    /**
+     * @param string $role
+     * @param string $endpointName
+     *
+     * @throws SlimBootstrap\Exception
+     */
+    public function accessRole(string $role, string $endpointName)
+    {
         if (false === \array_key_exists('roles', $this->config)
             || false === \is_array($this->config['roles'])
             || false === \array_key_exists($role, $this->config['roles'])

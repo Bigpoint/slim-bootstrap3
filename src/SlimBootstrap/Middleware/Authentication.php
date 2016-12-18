@@ -58,6 +58,8 @@ class Authentication implements SlimBootstrap\Middleware
      * @param callable                       $next
      *
      * @return Message\ResponseInterface
+     *
+     * @throws SlimBootstrap\Exception
      */
     public function execute(
         Message\ServerRequestInterface $request,
@@ -76,20 +78,38 @@ class Authentication implements SlimBootstrap\Middleware
                 return $next($request, $response);
             }
 
+            $aclConfig = $this->acl->getConfig();
+
+            if (null !== $this->authentication &&
+                (false === \is_array($aclConfig) || 0 === \count($aclConfig))
+            ) {
+                throw new SlimBootstrap\Exception('acl config is empty or invalid', 500);
+            }
+
             $this->logger->addInfo('using authentication');
 
-            $clientId = $this->authentication->authenticate($request);
+            $clientData = $this->authentication->authenticate($request);
+            $routeName  = $currentRoute->getName();
 
-            $this->logger->addInfo('authentication successfull');
+            $this->logger->addInfo('authentication successfull: ' . \var_export($clientData, true));
+
+            if (true === \is_array($clientData)) {
+                $clientId = $clientData['clientId'];
+                $role     = $clientData['role'];
+
+                $this->acl->accessRole($role, $routeName);
+            } else {
+                $clientId = $clientData;
+
+                $this->acl->access($clientId, $routeName);
+            }
+
+            $this->logger->addInfo('access granted');
 
             $request = $request->withAttribute('clientId', $clientId);
 
             $this->logger->addNotice('set clientId to parameter: ' . $clientId);
             $this->logger->addDebug(\var_export($request->getQueryParams(), true));
-
-            $this->acl->access($clientId, $currentRoute->getName());
-
-            $this->logger->addInfo('access granted');
         }
 
         return$newResponse = $next($request, $response);

@@ -54,7 +54,7 @@ class Jwt implements SlimBootstrap\Authentication
      *
      * @throws SlimBootstrap\Exception When the passed access $token is invalid.
      */
-    public function authenticate(Message\ServerRequestInterface $request): string
+    public function authenticate(Message\ServerRequestInterface $request)
     {
         try {
             $publicKey = $this->getPublicKey();
@@ -63,15 +63,15 @@ class Jwt implements SlimBootstrap\Authentication
             $this->verifyToken($token, $publicKey);
             $this->validateToken($token);
 
-            var_dump('Name: ' . $token->getClaim('name'));
-            var_dump('Role: ' . $token->getClaim('role'));
+            return [
+                'clientId' => $token->getClaim('name'),
+                'role' => $token->getClaim('role'),
+            ];
         } catch (\InvalidArgumentException $exception) {
             $this->logger->addInfo($exception->getMessage());
 
             throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
         }
-
-        die;
     }
 
     /**

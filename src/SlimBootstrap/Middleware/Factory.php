@@ -54,10 +54,6 @@ class Factory
         SlimBootstrap\Authentication $authentication = null,
         array $aclConfig = []
     ): SlimBootstrap\Middleware\Authentication {
-        if (false === \is_array($aclConfig)) {
-            throw new SlimBootstrap\Exception('acl config is empty or invalid', 500);
-        }
-
         return new SlimBootstrap\Middleware\Authentication(
             $logger,
             new SlimBootstrap\Acl($aclConfig),

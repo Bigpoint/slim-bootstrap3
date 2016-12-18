@@ -10,11 +10,6 @@ use \Slim;
  * Class Bootstrap
  *
  * @package SlimBootstrap
- *
- * @todo:
- *  - SlimBootstrap\Endpoint\ForceDefaultMimeType
- *  - mimetype handling
- *  - Response is \Psr\Http\Message\StreamInterface
  */
 class Bootstrap
 {
