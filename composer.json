@@ -16,6 +16,7 @@
   },
   "require": {
     "php": ">=7.0",
+    "bigpoint/http-caller-php": "1.*",
     "lcobucci/jwt": "3.*",
     "mdanter/ecc": "0.3.*",
     "monolog/monolog": "1.*",

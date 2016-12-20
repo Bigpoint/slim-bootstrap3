@@ -1,8 +1,9 @@
 <?php
 namespace SlimBootstrap\Authentication;
 
-use \Psr\Http\Message;
+use \Http;
 use \Monolog;
+use \Psr\Http\Message;
 use \SlimBootstrap;
 
 /**
@@ -21,7 +22,7 @@ class Oauth implements SlimBootstrap\Authentication
     private $apiUrl = '';
 
     /**
-     * @var SlimBootstrap\Caller\Http
+     * @var Http\Caller
      */
     private $httpCaller = null;
 
@@ -31,17 +32,12 @@ class Oauth implements SlimBootstrap\Authentication
     private $logger = null;
 
     /**
-     * @param string                    $apiUrl     URL of the oauth
-     *                                              authentication service
-     * @param SlimBootstrap\Caller\Http $httpCaller Caller class to make
-     *                                              http calls
-     * @param Monolog\Logger            $logger     Logger instance
+     * @param string         $apiUrl     URL of the oauth authentication service
+     * @param Http\Caller    $httpCaller Caller class to make http calls
+     * @param Monolog\Logger $logger     Logger instance
      */
-    public function __construct(
-        string $apiUrl,
-        SlimBootstrap\Caller\Http $httpCaller,
-        Monolog\Logger $logger
-    ) {
+    public function __construct(string $apiUrl, Http\Caller $httpCaller, Monolog\Logger $logger)
+    {
         $this->apiUrl     = $apiUrl;
         $this->httpCaller = $httpCaller;
         $this->logger     = $logger;

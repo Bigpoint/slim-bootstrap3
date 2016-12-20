@@ -1,6 +1,7 @@
 <?php
 namespace SlimBootstrap\Authentication;
 
+use \Http;
 use \Lcobucci;
 use \Monolog;
 use \Psr\Http\Message;
@@ -19,7 +20,7 @@ class Jwt implements SlimBootstrap\Authentication
     private $claimsConfig = [];
 
     /**
-     * @var SlimBootstrap\Caller\Http
+     * @var Http\Caller
      */
     private $httpCaller = null;
 
@@ -29,15 +30,15 @@ class Jwt implements SlimBootstrap\Authentication
     private $logger = null;
 
     /**
-     * @param string                    $providerUrl
-     * @param array                     $claimsConfig
-     * @param SlimBootstrap\Caller\Http $httpCaller
-     * @param Monolog\Logger            $logger
+     * @param string         $providerUrl
+     * @param array          $claimsConfig
+     * @param Http\Caller    $httpCaller
+     * @param Monolog\Logger $logger
      */
     public function __construct(
         string $providerUrl,
         array $claimsConfig,
-        SlimBootstrap\Caller\Http $httpCaller,
+        Http\Caller $httpCaller,
         Monolog\Logger $logger
     ) {
         $this->providerUrl  = $providerUrl;
@@ -81,9 +82,7 @@ class Jwt implements SlimBootstrap\Authentication
      */
     private function getPublicKey(): string
     {
-        $result = $this->httpCaller->get(
-            $this->providerUrl
-        );
+        $result = $this->httpCaller->get($this->providerUrl);
 
         if (200 !== $result['responseCode']) {
             throw new SlimBootstrap\Exception(

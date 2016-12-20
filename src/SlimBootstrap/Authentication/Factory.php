@@ -1,6 +1,7 @@
 <?php
 namespace SlimBootstrap\Authentication;
 
+use \Http;
 use \Monolog;
 use \SlimBootstrap;
 
@@ -17,7 +18,7 @@ class Factory
     private $config = null;
 
     /**
-     * @var SlimBootstrap\Caller\Http
+     * @var Http\Caller
      */
     private $httpCaller = null;
 
@@ -29,15 +30,12 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param array                     $config
-     * @param SlimBootstrap\Caller\Http $httpCaller
-     * @param Monolog\Logger            $logger
+     * @param array          $config
+     * @param Http\Caller    $httpCaller
+     * @param Monolog\Logger $logger
      */
-    public function __construct(
-        array $config,
-        SlimBootstrap\Caller\Http $httpCaller,
-        Monolog\Logger $logger
-    ) {
+    public function __construct(array $config, Http\Caller $httpCaller, Monolog\Logger $logger)
+    {
         $this->config     = $config;
         $this->httpCaller = $httpCaller;
         $this->logger     = $logger;
