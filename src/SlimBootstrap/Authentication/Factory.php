@@ -53,6 +53,9 @@ class Factory
         );
     }
 
+    /**
+     * @return SlimBootstrap\Authentication\Jwt
+     */
     public function createJwt(): SlimBootstrap\Authentication\Jwt
     {
         return new SlimBootstrap\Authentication\Jwt(

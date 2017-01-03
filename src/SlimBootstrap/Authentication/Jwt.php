@@ -66,7 +66,7 @@ class Jwt implements SlimBootstrap\Authentication
 
             return [
                 'clientId' => $token->getClaim('name'),
-                'role' => $token->getClaim('role'),
+                'role'     => $token->getClaim('role'),
             ];
         } catch (\InvalidArgumentException $exception) {
             $this->logger->addInfo($exception->getMessage());
@@ -131,6 +131,7 @@ class Jwt implements SlimBootstrap\Authentication
 
     /**
      * @param Lcobucci\JWT\Token $token
+     * @param string             $publicKey
      *
      * @throws SlimBootstrap\Exception
      */
