@@ -70,7 +70,12 @@ class Authentication implements SlimBootstrap\Middleware
         if (null !== $this->authentication) {
             /** @var Slim\Route $currentRoute */
             $currentRoute = $request->getAttribute('route');
-            $routeId      = $request->getMethod() . $currentRoute->getPattern();
+
+            if (null === $currentRoute) {
+                return $next($request, $response);
+            }
+
+            $routeId = $request->getMethod() . $currentRoute->getPattern();
 
             if (true === \array_key_exists($routeId, $this->endpointAuthentication)
                 && false === $this->endpointAuthentication[$routeId]
@@ -112,7 +117,7 @@ class Authentication implements SlimBootstrap\Middleware
             $this->logger->addDebug(\var_export($request->getQueryParams(), true));
         }
 
-        return$newResponse = $next($request, $response);
+        return $next($request, $response);
     }
 
     /**

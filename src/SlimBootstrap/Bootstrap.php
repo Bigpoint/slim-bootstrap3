@@ -173,6 +173,7 @@ class Bootstrap
                 Message\ResponseInterface $response,
                 array $args
             ) use ($endpoint, $type): Slim\Http\Response {
+var_dump($args); die;
                 /** @var Slim\Container $this */
                 $endpointHandler = $this->get('endpointHandler');
                 return $endpointHandler($endpoint, $type, $request, $response, $request->getQueryParams());
