@@ -118,30 +118,6 @@ class Bootstrap
             };
         };
 
-        // add endpoint handler
-        $container['endpointHandler'] = function ($container) {
-            return function (
-                SlimBootstrap\Endpoint $endpoint,
-                string $type,
-                Message\ServerRequestInterface $request,
-                Slim\Http\Response $response,
-                array $args
-            ): Slim\Http\Response {
-                $clientId = $request->getAttribute('clientId');
-
-                if (true === \is_string($clientId)) {
-                    $endpoint->setClientId($clientId);
-                }
-
-                $data = $endpoint->$type($args);
-
-                $outputWriter = $request->getAttribute('outputWriter');
-                $res = $outputWriter->write($response, $data);
-
-                return $res;
-            };
-        };
-
         $this->registerMiddlewares($this->app, $logger);
 
         return $this->app;
@@ -155,14 +131,14 @@ class Bootstrap
      * @param bool                   $authentication set this to false if you want no authentication for this endpoint
      *                                               (default: true)
      */
-    public function addCollectionEndpoint(
+    public function addEndpoint(
         string $type,
         string $route,
         string $name,
         SlimBootstrap\Endpoint $endpoint,
         bool $authentication = true
     ) {
-        $this->validateEndpoint($type, $endpoint, 'Collection');
+        $this->validateEndpoint($type, $endpoint);
 
         $this->authenticationMiddleware->setEndpointAuthentication(\strtoupper($type) . $route, $authentication);
 
@@ -171,45 +147,40 @@ class Bootstrap
             function (
                 Message\ServerRequestInterface $request,
                 Message\ResponseInterface $response,
-                array $args
+                array $routeArguments
             ) use ($endpoint, $type): Slim\Http\Response {
-var_dump($args); die;
-                /** @var Slim\Container $this */
-                $endpointHandler = $this->get('endpointHandler');
-                return $endpointHandler($endpoint, $type, $request, $response, $request->getQueryParams());
-            }
-        )->setName($name);
-    }
+                $clientId = $request->getAttribute('clientId');
 
-    /**
-     * @param string                 $type           should be one of \SlimBootstrap\Bootstrap::HTTP_METHOD_*
-     * @param string                 $route
-     * @param string                 $name           name of the route to add (used in ACL)
-     * @param SlimBootstrap\Endpoint $endpoint       should be one of \SlimBootstrap\Endpoint\Resource*
-     * @param bool                   $authentication set this to false if you want no authentication for this endpoint
-     *                                               (default: true)
-     */
-    public function addResourceEndpoint(
-        string $type,
-        string $route,
-        string $name,
-        SlimBootstrap\Endpoint $endpoint,
-        bool $authentication = true
-    ) {
-        $this->validateEndpoint($type, $endpoint, 'Resource');
+                if (true === \is_string($clientId)) {
+                    $endpoint->setClientId($clientId);
+                }
 
-        $this->authenticationMiddleware->setEndpointAuthentication(\strtoupper($type) . $route, $authentication);
+                switch ($type) {
+                    case self::HTTP_METHOD_DELETE:
+                        // fall through to GET
 
-        $this->app->$type(
-            $route,
-            function (
-                Message\ServerRequestInterface $request,
-                Slim\Http\Response $response,
-                array $args
-            ) use ($endpoint, $type): Slim\Http\Response {
-                /** @var Slim\Container $this */
-                $endpointHandler = $this->get('endpointHandler');
-                return $endpointHandler($endpoint, $type, $request, $response, $args);
+                    case self::HTTP_METHOD_GET:
+                        $data = $request->getQueryParams();
+                        break;
+
+                    case self::HTTP_METHOD_POST:
+                        // fall through to PUT
+
+                    case self::HTTP_METHOD_PUT:
+                        $data = $request->getParsedBody();
+                        break;
+
+                    default:
+                        $data = [];
+                }
+
+
+                $data = $endpoint->$type($routeArguments, $data);
+
+                $outputWriter = $request->getAttribute('outputWriter');
+                $newResponse  = $outputWriter->write($response, $data);
+
+                return $newResponse;
             }
         )->setName($name);
     }
@@ -217,19 +188,17 @@ var_dump($args); die;
     /**
      * @param string                 $type
      * @param SlimBootstrap\Endpoint $endpoint
-     * @param string                 $endpointType
      *
      * @throws SlimBootstrap\Exception
      */
-    private function validateEndpoint(string $type, SlimBootstrap\Endpoint $endpoint, string $endpointType)
+    private function validateEndpoint(string $type, SlimBootstrap\Endpoint $endpoint)
     {
         $interfaces = \class_implements($endpoint);
-        $interface  = 'SlimBootstrap\\Endpoint\\' . $endpointType . \ucfirst($type);
+        $interface  = 'SlimBootstrap\\Endpoint\\' . \ucfirst($type);
 
         if (false === \array_key_exists($interface, $interfaces)) {
             throw new SlimBootstrap\Exception(
-                'endpoint "' . \get_class($endpoint) . '" is not a valid '
-                . $endpointType . ' ' . \strtoupper($type) . ' endpoint'
+                'endpoint "' . \get_class($endpoint) . '" is not a valid ' . \strtoupper($type) . ' endpoint'
             );
         }
     }
