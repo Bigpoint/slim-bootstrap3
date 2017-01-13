@@ -29,7 +29,7 @@ In order to create a REST API based on this framework you need a structure simil
 ├── config
 │   └── application.json
 ├── include
-│   └── ###Namespace###
+│   └── Dummy
 │       └── Endpoint
 │           └── V1
 │               ├── EndpointA.php
@@ -68,8 +68,8 @@ The following structure has to be present:
 
 The `cacheDuration` defines the interval (in seconds) used for the cache expire headers of the response.
 
-If the `debug` flag is set to true the slim framework will print out a stack trace if an error occurs. Otherwise it will
-just show a "500 Internal Server Error".
+If the `displayErrorDetails` flag is set to true the slim framework will print out a stack trace if an error occurs.
+Otherwise it will just show a "500 Internal Server Error".
 
 ### the include/ folder
 This folder should contain your endpoint implementation. Read below about how to define an endpoint.
