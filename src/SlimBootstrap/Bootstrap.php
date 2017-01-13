@@ -127,7 +127,7 @@ class Bootstrap
      * @param string                 $type           should be one of \SlimBootstrap\Bootstrap::HTTP_METHOD_*
      * @param string                 $route
      * @param string                 $name           name of the route to add (used in ACL)
-     * @param SlimBootstrap\Endpoint $endpoint       should be one of \SlimBootstrap\Endpoint\Collection*
+     * @param SlimBootstrap\Endpoint $endpoint       should be one of \SlimBootstrap\Endpoint\*
      * @param bool                   $authentication set this to false if you want no authentication for this endpoint
      *                                               (default: true)
      */
