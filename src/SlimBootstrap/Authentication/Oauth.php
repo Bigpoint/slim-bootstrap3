@@ -86,14 +86,6 @@ class Oauth implements SlimBootstrap\Authentication
             return $queryParameters['access_token'];
         }
 
-        if (true === \array_key_exists('token', $queryParameters)) {
-            $this->logger->addNotice(
-                'please use "access_token" instead of "token" parameter, because "token" parameter is deprecated'
-            );
-
-            return $queryParameters['token'];
-        }
-
         return '';
     }
 }
