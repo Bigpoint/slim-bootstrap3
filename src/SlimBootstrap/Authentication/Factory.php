@@ -66,7 +66,7 @@ class Factory
      *
      * @throws SlimBootstrap\Exception if "jwt" config is invalid
      */
-    public function createJwt(): SlimBootstrap\Authentication\Jwt
+    public function createJwt(array $config): SlimBootstrap\Authentication\Jwt
     {
         if (false === \array_key_exists('jwt', $config)
             || false === \is_array($config['jwt'])
