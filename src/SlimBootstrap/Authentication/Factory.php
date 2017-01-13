@@ -74,7 +74,7 @@ class Factory
             || false === \is_string($config['jwt']['providerUrl'])
             || true === empty($config['jwt']['providerUrl'])
             || false === \array_key_exists('claims', $config['jwt'])
-            || false === \is_string($config['jwt']['claims'])
+            || false === \is_array($config['jwt']['claims'])
             || 0 === \count($config['jwt']['claims'])
         ) {
             throw new SlimBootstrap\Exception('"jwt" config invalid');

@@ -27,6 +27,9 @@
     "mdanter/ecc": "needed for JWT support (0.3.*)"
   },
   "require-dev": {
+    "ext-gmp": "*",
+    "lcobucci/jwt": "3.*",
+    "mdanter/ecc": "0.3.*",
     "phpunit/phpunit": "5.*"
   },
   "conflict": {
