@@ -29,7 +29,7 @@ In order to create a REST API based on this framework you need a structure simil
 ├── config
 │   └── application.json
 ├── include
-│   └── Dummy
+│   └── DummyApi
 │       └── Endpoint
 │           └── V1
 │               ├── EndpointA.php
@@ -100,7 +100,7 @@ $slimBootstrap->addEndpoint(
     SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
     '/dummy/test/{id:[0-9]+}',
     'dummy',
-    new \DummyApi\Endpoint\Dummy()
+    new \DummyApi\Endpoint\V1\EndpointA()
 );
 
 $slimApp->run();
@@ -221,7 +221,7 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
      SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
      '/dummy/test/{id:[0-9]+}',
      'dummy',
-     new \DummyApi\Endpoint\Dummy()
+     new \DummyApi\Endpoint\V1\EndpointA()
  );
 
  $slimApp->run();
