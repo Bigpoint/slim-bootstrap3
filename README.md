@@ -206,7 +206,6 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
  \Monolog\ErrorHandler::register($logger);
 
 +$authenticationFactory = new \SlimBootstrap\Authentication\Factory(
-+    $applicationConfig,
 +    new \Http\Caller($logger),
 +    $logger
 +);
@@ -251,7 +250,7 @@ fine, access is granted to requester. Otherwise request is aborted with an 401 o
      $applicationConfig,
 -    $middlewareFactory
 +    $middlewareFactory,
-+    $authenticationFactory->createOauth(),
++    $authenticationFactory->createOauth($applicationConfig),
 +    $aclConfig
  );
 ~~~
@@ -286,7 +285,7 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
      $applicationConfig,
 -    $middlewareFactory
 +    $middlewareFactory,
-+    $authenticationFactory->createJwt(),
++    $authenticationFactory->createJwt($applicationConfig),
 +    $aclConfig
  );
 ~~~
