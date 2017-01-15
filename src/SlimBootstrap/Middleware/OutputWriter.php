@@ -63,7 +63,7 @@ class OutputWriter implements SlimBootstrap\Middleware
      */
     private function determineOutputWriter(string $acceptHeader): SlimBootstrap\OutputWriter
     {
-        if (null === $acceptHeader) {
+        if (null === $acceptHeader || '' === $acceptHeader) {
             return $this->createJson();
         }
 
