@@ -46,11 +46,11 @@ class Oauth implements SlimBootstrap\Authentication
     /**
      * @param Message\ServerRequestInterface $request The object holding information about the current request.
      *
-     * @return string The clientId of the calling client.
+     * @return array with the clientId of the calling client.
      *
      * @throws SlimBootstrap\Exception When the passed access $token is invalid.
      */
-    public function authenticate(Message\ServerRequestInterface $request): string
+    public function authenticate(Message\ServerRequestInterface $request): array
     {
         $token  = $this->determineToken($request->getQueryParams());
         $result = $this->httpCaller->get(
@@ -71,8 +71,10 @@ class Oauth implements SlimBootstrap\Authentication
                 Monolog\Logger::WARNING
             );
         }
-
-        return $result['entity_id'];
+        return [
+            'clientId' => $result['entity_id'],
+            'role'     => '',
+        ];
     }
 
     /**

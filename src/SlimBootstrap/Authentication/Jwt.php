@@ -51,11 +51,11 @@ class Jwt implements SlimBootstrap\Authentication
     /**
      * @param Message\ServerRequestInterface $request The object holding information about the current request.
      *
-     * @return string The clientId of the calling client.
+     * @return array
      *
      * @throws SlimBootstrap\Exception When the passed access $token is invalid.
      */
-    public function authenticate(Message\ServerRequestInterface $request)
+    public function authenticate(Message\ServerRequestInterface $request): array
     {
         try {
             $publicKey = $this->getPublicKey();

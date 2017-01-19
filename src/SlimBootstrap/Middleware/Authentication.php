@@ -94,18 +94,14 @@ class Authentication implements SlimBootstrap\Middleware
             $this->logger->addInfo('using authentication');
 
             $clientData = $this->authentication->authenticate($request);
+            $clientId   = $clientData['clientId'];
             $routeName  = $currentRoute->getName();
 
             $this->logger->addInfo('authentication successfull: ' . \var_export($clientData, true));
 
-            if (true === \is_array($clientData)) {
-                $clientId = $clientData['clientId'];
-                $role     = $clientData['role'];
-
-                $this->acl->accessRole($role, $routeName);
+            if (2 === \count($clientData)) {
+                $this->acl->accessRole($clientData['role'], $routeName);
             } else {
-                $clientId = $clientData;
-
                 $this->acl->access($clientId, $routeName);
             }
 
