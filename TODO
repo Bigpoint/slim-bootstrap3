@@ -1,0 +1,35 @@
+- return array in Authenticate\Oauth
+- move new class declarations from JWT to factory
+- make Access-Allow-Control-Origin header configurable
+- GET parameters in POST or PUT?
+- remove remaining CSV stuff
+- shorten index.php code
+
+
+
+
+
+<?php
+require(__DIR__ . '/../vendor/autoload.php');
+
+$applicationConfig = \json_decode(\file_get_contents(__DIR__ . '/../config/application.json'), true);
+
+$loggerFactory = new \MonologCreator\Factory($applicationConfig['monolog']);
+$logger        = $loggerFactory->createLogger('dummyApi');
+\Monolog\ErrorHandler::register($logger);
+
+$endpoints = [
+    [
+        'type'  => SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
+        'route' => '/dummy/test/{id:[0-9]+}',
+        'name'  => 'dummy',
+        'instance' => new DummyApi\Endpoint\Dummy(),
+        'authentication' => false,
+    ],
+];
+
+$slimBootstrap = new \SlimBootstrap\Bootstrap(
+    $applicationConfig,
+    $logger
+);
+$slimBootstrap->init($endpoints)->run();
