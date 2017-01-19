@@ -29,11 +29,6 @@ class Bootstrap
     private $authentication = null;
 
     /**
-     * @var array
-     */
-    private $aclConfig = [];
-
-    /**
      * @var Slim\App
      */
     private $app = null;
@@ -51,16 +46,13 @@ class Bootstrap
     /**
      * @param array                        $applicationConfig
      * @param SlimBootstrap\Authentication $authentication
-     * @param array                        $aclConfig
      */
     public function __construct(
         array $applicationConfig,
-        SlimBootstrap\Authentication $authentication = null,
-        array $aclConfig = []
+        SlimBootstrap\Authentication $authentication = null
     ) {
         $this->applicationConfig = $applicationConfig;
         $this->authentication    = $authentication;
-        $this->aclConfig         = $aclConfig;
     }
 
     /**
@@ -211,7 +203,7 @@ class Bootstrap
         $this->authenticationMiddleware = $middlewareFactory->getAuthentication(
             $logger,
             $this->authentication,
-            $this->aclConfig
+            $this->applicationConfig
         );
 
         $app->add([$this->outputWriterMiddleware, 'execute']);

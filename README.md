@@ -174,18 +174,22 @@ authentication method you are using.
 
 ### Changes for authentication
 
-#### config/acl.json
-You have to add a config/acl.json, which defines accessible endpoints for a clientId.
+#### Changes to config/application.json
+You have to add a "acl" key to the application.json config, which defines accessible endpoints for a clientId.
 ~~~json
 {
-    "roles": {
-        "role_dummy": {
-            "dummy": true
+    ...
+    "acl": {
+        "roles": {
+            "role_dummy": {
+                "dummy": true
+            }
+        },
+        "access": {
+            "myDummyClientId": "role_dummy"
         }
-    },
-    "access": {
-        "myDummyClientId": "role_dummy"
     }
+    ...
 }
 ~~~
 This is mapping the clientId "myDummyClientId" to the role "role_dummy" which has access to the "dummy" endpoint.
@@ -196,7 +200,6 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
  require(__DIR__ . '/../vendor/autoload.php');
 
  $applicationConfig = \json_decode(\file_get_contents(__DIR__ . '/../config/application.json'), true);
-+$aclConfig         = \json_decode(\file_get_contents(__DIR__ . '/../config/acl.json'), true);
 
  $loggerFactory = new \MonologCreator\Factory($applicationConfig['monolog']);
  $logger        = $loggerFactory->createLogger('dummyApi');
@@ -245,8 +248,7 @@ fine, access is granted to requester. Otherwise request is aborted with an 401 o
  $slimBootstrap = new \SlimBootstrap\Bootstrap(
 -    $applicationConfig
 +    $applicationConfig,
-+    $authenticationFactory->createOauth($applicationConfig),
-+    $aclConfig
++    $authenticationFactory->createOauth($applicationConfig)
  );
 ~~~
 
@@ -279,8 +281,7 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
  $slimBootstrap         = new \SlimBootstrap\Bootstrap(
 -    $applicationConfig
 +    $applicationConfig,
-+    $authenticationFactory->createJwt($applicationConfig),
-+    $aclConfig
++    $authenticationFactory->createJwt($applicationConfig)
  );
 ~~~
 

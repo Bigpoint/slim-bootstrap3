@@ -41,7 +41,7 @@ class Factory
     /**
      * @param Monolog\Logger                $logger
      * @param \SlimBootstrap\Authentication $authentication
-     * @param array                         $aclConfig
+     * @param array                         $applicationConfig
      *
      * @return \SlimBootstrap\Middleware\Authentication
      *
@@ -50,8 +50,16 @@ class Factory
     public function getAuthentication(
         Monolog\Logger $logger,
         SlimBootstrap\Authentication $authentication = null,
-        array $aclConfig = []
+        array $applicationConfig = []
     ): SlimBootstrap\Middleware\Authentication {
+        $aclConfig = [];
+
+        if (true === \array_key_exists('acl', $applicationConfig)
+            && true === \is_array($applicationConfig['acl'])
+        ) {
+            $aclConfig = $applicationConfig['acl'];
+        }
+
         return new SlimBootstrap\Middleware\Authentication(
             $logger,
             new SlimBootstrap\Acl($aclConfig),
