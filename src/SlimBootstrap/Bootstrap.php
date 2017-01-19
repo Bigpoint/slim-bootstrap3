@@ -27,6 +27,7 @@ class Bootstrap
      * @var SlimBootstrap\Authentication
      */
     private $authentication = null;
+
     /**
      * @var \Monolog\Logger
      */
@@ -63,9 +64,9 @@ class Bootstrap
     }
 
     /**
-     * @return Slim\App
+     * @return SlimBootstrap\Bootstrap
      */
-    public function init(): Slim\App
+    public function init(): SlimBootstrap\Bootstrap
     {
         $this->app = new Slim\App(
             [
@@ -109,7 +110,15 @@ class Bootstrap
 
         $this->registerMiddlewares($this->app);
 
-        return $this->app;
+        return $this;
+    }
+
+    /**
+     * Run the actual Slim application
+     */
+    public function run()
+    {
+        $this->app->run();
     }
 
     /**

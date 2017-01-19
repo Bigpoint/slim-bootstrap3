@@ -93,7 +93,7 @@ $slimBootstrap = new \SlimBootstrap\Bootstrap(
     $logger
 );
 
-$slimApp = $slimBootstrap->init();
+$slimBootstrap->init();
 
 $slimBootstrap->addEndpoint(
     SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
@@ -102,7 +102,7 @@ $slimBootstrap->addEndpoint(
     new \DummyApi\Endpoint\V1\EndpointA()
 );
 
-$slimApp->run();
+$slimBootstrap->run();
 ~~~
 
 
@@ -216,7 +216,7 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
      $logger
  );
 
- $slimApp = $slimBootstrap->init();
+ $slimBootstrap->init();
 
  $slimBootstrap->addEndpoint(
      SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
@@ -225,7 +225,7 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
      new \DummyApi\Endpoint\V1\EndpointA()
  );
 
- $slimApp->run();
+ $slimBootstrap->run();
 ~~~
 
 ### OAuth
