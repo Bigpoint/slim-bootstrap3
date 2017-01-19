@@ -211,16 +211,9 @@ class Bootstrap
      */
     private function registerMiddlewares(Slim\App $app, Monolog\Logger $logger)
     {
-        $csvConfig = [];
-        if (true === \array_key_exists('csv', $this->applicationConfig)
-            && true === \is_array($this->applicationConfig['csv'])
-        ) {
-            $csvConfig = $this->applicationConfig['csv'];
-        }
-
         $logMiddleware                  = $this->middlewareFactory->getLog($logger);
         $headerMiddleware               = $this->middlewareFactory->getHeader();
-        $this->outputWriterMiddleware   = $this->middlewareFactory->getOutputWriter($csvConfig);
+        $this->outputWriterMiddleware   = $this->middlewareFactory->getOutputWriter();
         $this->authenticationMiddleware = $this->middlewareFactory->getAuthentication(
             $logger,
             $this->authentication,

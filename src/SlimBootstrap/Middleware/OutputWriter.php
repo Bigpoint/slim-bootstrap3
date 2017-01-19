@@ -22,19 +22,6 @@ class OutputWriter implements SlimBootstrap\Middleware
     ];
 
     /**
-     * @var array
-     */
-    private $csvConfig = [];
-
-    /**
-     * @param array $csvConfig
-     */
-    public function __construct(array $csvConfig)
-    {
-        $this->csvConfig = $csvConfig;
-    }
-
-    /**
      * @param Message\ServerRequestInterface $request
      * @param Slim\Http\Response             $response
      * @param callable                       $next
