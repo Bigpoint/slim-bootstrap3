@@ -88,10 +88,8 @@ $logger        = $loggerFactory->createLogger('dummyApi');
 
 \Monolog\ErrorHandler::register($logger);
 
-$middlewareFactory     = new \SlimBootstrap\Middleware\Factory();
-$slimBootstrap         = new \SlimBootstrap\Bootstrap(
-    $applicationConfig,
-    $middlewareFactory
+$slimBootstrap = new \SlimBootstrap\Bootstrap(
+    $applicationConfig
 );
 
 $slimApp = $slimBootstrap->init($logger);
@@ -209,10 +207,8 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
 +    new \Http\Caller($logger),
 +    $logger
 +);
- $middlewareFactory     = new \SlimBootstrap\Middleware\Factory();
- $slimBootstrap         = new \SlimBootstrap\Bootstrap(
-     $applicationConfig,
-     $middlewareFactory
+ $slimBootstrap = new \SlimBootstrap\Bootstrap(
+     $applicationConfig
  );
 
  $slimApp = $slimBootstrap->init($logger);
@@ -246,10 +242,9 @@ fine, access is granted to requester. Otherwise request is aborted with an 401 o
 
 #### Changes to www/index.php
 ~~~diff
- $slimBootstrap         = new \SlimBootstrap\Bootstrap(
-     $applicationConfig,
--    $middlewareFactory
-+    $middlewareFactory,
+ $slimBootstrap = new \SlimBootstrap\Bootstrap(
+-    $applicationConfig
++    $applicationConfig,
 +    $authenticationFactory->createOauth($applicationConfig),
 +    $aclConfig
  );
@@ -282,9 +277,8 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
 #### Changes to www/index.php
 ~~~diff
  $slimBootstrap         = new \SlimBootstrap\Bootstrap(
-     $applicationConfig,
--    $middlewareFactory
-+    $middlewareFactory,
+-    $applicationConfig
++    $applicationConfig,
 +    $authenticationFactory->createJwt($applicationConfig),
 +    $aclConfig
  );

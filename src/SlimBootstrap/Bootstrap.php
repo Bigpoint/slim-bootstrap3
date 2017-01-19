@@ -24,11 +24,6 @@ class Bootstrap
     private $applicationConfig = [];
 
     /**
-     * @var SlimBootstrap\Middleware\Factory
-     */
-    private $middlewareFactory = null;
-
-    /**
      * @var SlimBootstrap\Authentication
      */
     private $authentication = null;
@@ -54,19 +49,16 @@ class Bootstrap
     private $authenticationMiddleware = null;
 
     /**
-     * @param array                            $applicationConfig
-     * @param SlimBootstrap\Middleware\Factory $middlewareFactory
-     * @param SlimBootstrap\Authentication     $authentication
-     * @param array                            $aclConfig
+     * @param array                        $applicationConfig
+     * @param SlimBootstrap\Authentication $authentication
+     * @param array                        $aclConfig
      */
     public function __construct(
         array $applicationConfig,
-        SlimBootstrap\Middleware\Factory $middlewareFactory,
         SlimBootstrap\Authentication $authentication = null,
         array $aclConfig = []
     ) {
         $this->applicationConfig = $applicationConfig;
-        $this->middlewareFactory = $middlewareFactory;
         $this->authentication    = $authentication;
         $this->aclConfig         = $aclConfig;
     }
@@ -211,10 +203,12 @@ class Bootstrap
      */
     private function registerMiddlewares(Slim\App $app, Monolog\Logger $logger)
     {
-        $logMiddleware                  = $this->middlewareFactory->getLog($logger);
-        $headerMiddleware               = $this->middlewareFactory->getHeader();
-        $this->outputWriterMiddleware   = $this->middlewareFactory->getOutputWriter();
-        $this->authenticationMiddleware = $this->middlewareFactory->getAuthentication(
+        $middlewareFactory = new SlimBootstrap\Middleware\Factory();
+
+        $logMiddleware                  = $middlewareFactory->getLog($logger);
+        $headerMiddleware               = $middlewareFactory->getHeader();
+        $this->outputWriterMiddleware   = $middlewareFactory->getOutputWriter();
+        $this->authenticationMiddleware = $middlewareFactory->getAuthentication(
             $logger,
             $this->authentication,
             $this->aclConfig
@@ -222,7 +216,7 @@ class Bootstrap
 
         $app->add([$this->outputWriterMiddleware, 'execute']);
         $app->add([$this->authenticationMiddleware, 'execute']);
-        $app->add($this->middlewareFactory->getCache($this->applicationConfig['cacheDuration']));
+        $app->add($middlewareFactory->getCache($this->applicationConfig['cacheDuration']));
         $app->add([$headerMiddleware, 'execute']);
         $app->add([$logMiddleware, 'execute']);
     }
