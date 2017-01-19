@@ -13,11 +13,6 @@ use \SlimBootstrap;
 class Factory
 {
     /**
-     * @var Http\Caller
-     */
-    private $httpCaller = null;
-
-    /**
      * @var Monolog\Logger
      */
     private $logger = null;
@@ -25,13 +20,11 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param Http\Caller    $httpCaller
      * @param Monolog\Logger $logger
      */
-    public function __construct(Http\Caller $httpCaller, Monolog\Logger $logger)
+    public function __construct(Monolog\Logger $logger)
     {
-        $this->httpCaller = $httpCaller;
-        $this->logger     = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -54,7 +47,7 @@ class Factory
 
         return new SlimBootstrap\Authentication\Oauth(
             $config['oauth']['authenticationUrl'],
-            $this->httpCaller,
+            new \Http\Caller($this->logger),
             $this->logger
         );
     }
@@ -83,7 +76,7 @@ class Factory
         return new SlimBootstrap\Authentication\Jwt(
             $config['jwt']['providerUrl'],
             $config['jwt']['claims'],
-            $this->httpCaller,
+            new \Http\Caller($this->logger),
             $this->logger
         );
     }

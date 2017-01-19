@@ -194,39 +194,6 @@ You have to add a "acl" key to the application.json config, which defines access
 ~~~
 This is mapping the clientId "myDummyClientId" to the role "role_dummy" which has access to the "dummy" endpoint.
 
-#### Changes to www/index.php
-~~~diff
- <?php
- require(__DIR__ . '/../vendor/autoload.php');
-
- $applicationConfig = \json_decode(\file_get_contents(__DIR__ . '/../config/application.json'), true);
-
- $loggerFactory = new \MonologCreator\Factory($applicationConfig['monolog']);
- $logger        = $loggerFactory->createLogger('dummyApi');
-
- \Monolog\ErrorHandler::register($logger);
-
-$endpoints = [
-    [
-        'type'           => SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
-        'route'          => '/dummy/test/{id:[0-9]+}',
-        'name'           => 'dummy',
-        'instance'       => new DummyApi\Endpoint\V1\Dummy(),
-        'authentication' => false,
-    ],
-];
-
-+$authenticationFactory = new \SlimBootstrap\Authentication\Factory(
-+    new \Http\Caller($logger),
-+    $logger
-+);
- $slimBootstrap = new \SlimBootstrap\Bootstrap(
-     $applicationConfig,
-     $logger
- );
- $slimBootstrap->init($endpoints)->run();
-~~~
-
 ### OAuth
 You have to add the url parameter `access_token` to api calls with an access token given from your oauth server. The
 authentication logic validates this access token against the configured oauth server via its /me endpoint. Next the
@@ -250,7 +217,7 @@ fine, access is granted to requester. Otherwise request is aborted with an 401 o
      $applicationConfig,
 -    $logger
 +    $logger,
-+    $authenticationFactory->createOauth($applicationConfig)
++    'oauth'
  );
 ~~~
 
@@ -284,13 +251,14 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
      $applicationConfig,
 -    $logger
 +    $logger,
-+    $authenticationFactory->createJwt($applicationConfig)
++    'jwt'
  );
 ~~~
 
 ### Custom Authentication
 If you want, you can define your own authentication class which for example reads from a database. If you want to do
 this you have to implement the [Authentication interface](https://github.com/Bigpoint/slim-bootstrap3/blob/master/src/SlimBootstrap/Authenticate.php).
+This implementation can passed as last parameter to the `\SlimBootstrap\Bootstrap` constructor instead of the string.
 
 
 ## License & Authors

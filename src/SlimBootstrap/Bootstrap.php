@@ -24,7 +24,7 @@ class Bootstrap
     private $applicationConfig = [];
 
     /**
-     * @var SlimBootstrap\Authentication
+     * @var SlimBootstrap\Authentication|string
      */
     private $authentication = null;
 
@@ -49,14 +49,14 @@ class Bootstrap
     private $authenticationMiddleware = null;
 
     /**
-     * @param array                        $applicationConfig
-     * @param Monolog\Logger               $logger
-     * @param SlimBootstrap\Authentication $authentication
+     * @param array                               $applicationConfig
+     * @param Monolog\Logger                      $logger
+     * @param string|SlimBootstrap\Authentication $authentication
      */
     public function __construct(
         array $applicationConfig,
         Monolog\Logger $logger,
-        SlimBootstrap\Authentication $authentication = null
+        $authentication = null
     ) {
         $this->applicationConfig = $applicationConfig;
         $this->logger            = $logger;
@@ -260,10 +260,37 @@ class Bootstrap
      * Register middlewares (last in first executed).
      *
      * @param \Slim\App $app
+     *
+     * @throws SlimBootstrap\Exception
      */
     private function registerMiddlewares(Slim\App $app)
     {
         $middlewareFactory = new SlimBootstrap\Middleware\Factory();
+
+        if (true === \is_string($this->authentication)) {
+            $authenticationFactory = new \SlimBootstrap\Authentication\Factory($this->logger);
+
+            $method = 'create' . \ucfirst($this->authentication);
+
+            if (false === \method_exists($authenticationFactory, $method)
+                || false === \is_callable([$authenticationFactory, $method])
+            ) {
+                throw new \SlimBootstrap\Exception(
+                    \sprintf(
+                        'auth method "%s" does not exist',
+                        $this->authentication
+                    )
+                );
+            }
+
+            $this->authentication = $authenticationFactory->$method($this->applicationConfig);
+
+            if (!($this->authentication instanceof SlimBootstrap\Authentication)) {
+                throw new \SlimBootstrap\Exception(
+                    'The authentication module has to implement the \SlimBootstrap\Authentication interface'
+                );
+            }
+        }
 
         $logMiddleware                  = $middlewareFactory->getLog($this->logger);
         $headerMiddleware               = $middlewareFactory->getHeader();
