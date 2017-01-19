@@ -27,6 +27,10 @@ class Bootstrap
      * @var SlimBootstrap\Authentication
      */
     private $authentication = null;
+    /**
+     * @var \Monolog\Logger
+     */
+    private $logger = null;
 
     /**
      * @var Slim\App
@@ -45,22 +49,23 @@ class Bootstrap
 
     /**
      * @param array                        $applicationConfig
+     * @param Monolog\Logger               $logger
      * @param SlimBootstrap\Authentication $authentication
      */
     public function __construct(
         array $applicationConfig,
+        Monolog\Logger $logger,
         SlimBootstrap\Authentication $authentication = null
     ) {
         $this->applicationConfig = $applicationConfig;
+        $this->logger            = $logger;
         $this->authentication    = $authentication;
     }
 
     /**
-     * @param Monolog\Logger $logger
-     *
      * @return Slim\App
      */
-    public function init(Monolog\Logger $logger): Slim\App
+    public function init(): Slim\App
     {
         $this->app = new Slim\App(
             [
@@ -73,8 +78,8 @@ class Bootstrap
         $container = $this->app->getContainer();
 
         // add a logger
-        $container['logger'] = function ($container) use ($logger) {
-            return $logger;
+        $container['logger'] = function ($container) {
+            return $this->logger;
         };
 
         // add an errorHandler
@@ -102,7 +107,7 @@ class Bootstrap
             };
         };
 
-        $this->registerMiddlewares($this->app, $logger);
+        $this->registerMiddlewares($this->app);
 
         return $this->app;
     }
@@ -190,18 +195,17 @@ class Bootstrap
     /**
      * Register middlewares (last in first executed).
      *
-     * @param \Slim\App       $app
-     * @param \Monolog\Logger $logger
+     * @param \Slim\App $app
      */
-    private function registerMiddlewares(Slim\App $app, Monolog\Logger $logger)
+    private function registerMiddlewares(Slim\App $app)
     {
         $middlewareFactory = new SlimBootstrap\Middleware\Factory();
 
-        $logMiddleware                  = $middlewareFactory->getLog($logger);
+        $logMiddleware                  = $middlewareFactory->getLog($this->logger);
         $headerMiddleware               = $middlewareFactory->getHeader();
         $this->outputWriterMiddleware   = $middlewareFactory->getOutputWriter();
         $this->authenticationMiddleware = $middlewareFactory->getAuthentication(
-            $logger,
+            $this->logger,
             $this->authentication,
             $this->applicationConfig
         );

@@ -89,10 +89,11 @@ $logger        = $loggerFactory->createLogger('dummyApi');
 \Monolog\ErrorHandler::register($logger);
 
 $slimBootstrap = new \SlimBootstrap\Bootstrap(
-    $applicationConfig
+    $applicationConfig,
+    $logger
 );
 
-$slimApp = $slimBootstrap->init($logger);
+$slimApp = $slimBootstrap->init();
 
 $slimBootstrap->addEndpoint(
     SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
@@ -211,10 +212,11 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
 +    $logger
 +);
  $slimBootstrap = new \SlimBootstrap\Bootstrap(
-     $applicationConfig
+     $applicationConfig,
+     $logger
  );
 
- $slimApp = $slimBootstrap->init($logger);
+ $slimApp = $slimBootstrap->init();
 
  $slimBootstrap->addEndpoint(
      SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
@@ -246,8 +248,9 @@ fine, access is granted to requester. Otherwise request is aborted with an 401 o
 #### Changes to www/index.php
 ~~~diff
  $slimBootstrap = new \SlimBootstrap\Bootstrap(
--    $applicationConfig
-+    $applicationConfig,
+     $applicationConfig,
+-    $logger
++    $logger,
 +    $authenticationFactory->createOauth($applicationConfig)
  );
 ~~~
@@ -279,8 +282,9 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
 #### Changes to www/index.php
 ~~~diff
  $slimBootstrap         = new \SlimBootstrap\Bootstrap(
--    $applicationConfig
-+    $applicationConfig,
+     $applicationConfig,
+-    $logger
++    $logger,
 +    $authenticationFactory->createJwt($applicationConfig)
  );
 ~~~
