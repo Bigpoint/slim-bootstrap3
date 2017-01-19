@@ -88,21 +88,21 @@ $logger        = $loggerFactory->createLogger('dummyApi');
 
 \Monolog\ErrorHandler::register($logger);
 
+$endpoints = [
+    [
+        'type'           => SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
+        'route'          => '/dummy/test/{id:[0-9]+}',
+        'name'           => 'dummy',
+        'instance'       => new DummyApi\Endpoint\V1\Dummy(),
+        'authentication' => false,
+    ],
+];
+
 $slimBootstrap = new \SlimBootstrap\Bootstrap(
     $applicationConfig,
     $logger
 );
-
-$slimBootstrap->init();
-
-$slimBootstrap->addEndpoint(
-    SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
-    '/dummy/test/{id:[0-9]+}',
-    'dummy',
-    new \DummyApi\Endpoint\V1\EndpointA()
-);
-
-$slimBootstrap->run();
+$slimBootstrap->init($endpoints)->run();
 ~~~
 
 
@@ -127,37 +127,36 @@ For each of these methods the framework supplies an interface for the endpoints 
 
 ### Registering endpoints to the framework
 The written endpoints have to be registered to the framework and the underlying Slim instance in order to be
-accessible. This can be done by calling `addEndpoint()` on the `\SlimBootstrap\Bootstrap` instance after the `init()`
-call and before the `run()` cal. The framework is using the basic form of slim to
-[register a route](https://www.slimframework.com/docs/objects/router.html) and bind an endpoint to the route. However
-at the moment slim-bootstrap3 doesn't allow grouping of endpoints. The `\SlimBootstrap\Bootstrap::addEndpoint()` method
-has the following signature:
+accessible. This is done by passing an array to the `init()` on the `\SlimBootstrap\Bootstrap` instance. The framework
+is using the basic form of slim to [register a route](https://www.slimframework.com/docs/objects/router.html) and bind
+an endpoint to the route. However at the moment slim-bootstrap3 doesn't allow grouping of endpoints.
+The array has to have the following structure:
 
 ~~~php
-/**
- * @param string                 $type           should be one of \SlimBootstrap\Bootstrap::HTTP_METHOD_*
- * @param string                 $route          pattern for the route to match
- * @param string                 $name           name of the route to add (used in ACL)
- * @param SlimBootstrap\Endpoint $endpoint       should be one of \SlimBootstrap\Endpoint\*
- * @param bool                   $authentication set this to false if you want no authentication for this endpoint
- *                                               (default: true)
- */
-public function addEndpoint(
-    string $type,
-    string $route,
-    string $name,
-    SlimBootstrap\Endpoint $endpoint,
-    bool $authentication = true
-);
+$endpoints = [
+    [
+        'type'     => SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
+        'route'    => '/dummy/test/{id:[0-9]+}',
+        'name'     => 'dummy',
+        'instance' => new DummyApi\Endpoint\Dummy(),
+    ],
+    [
+        'type'           => SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
+        'route'          => '/dummy/test/{id:[0-9]+}',
+        'name'           => 'dummy-other',
+        'instance'       => new DummyApi\Endpoint\DummyOther(),
+        'authentication' => false
+    ],
+];
 ~~~
 
 | parameter       | type                   | required | default | description |
 | --------------- | ---------------------- | -------- | ------- | ----------- |
-| $type           | string                 | yes      |         | should be one of the \SlimBootstrap\Bootstrap::HTTP_METHOD_* constants to define the method you want to match |
-| $route          | string                 | yes      |         | pattern for the route to match. See [Route documentation](https://www.slimframework.com/docs/objects/router.html#route-placeholders) of slim for details |
-| $name           | string                 | yes      |         | name to identify this (group of) endpoint(s). Used in the ACL handling |
-| $endpoint       | SlimBootstrap\Endpoint | yes      |         | Instance of endpoint class. Has to match the Endpoint interface corresponding to the `$type` used |
-| $authentication | bool                   | no       | true    | It is possible to disable authentication for only one specific endpoint. This flag is used for that |
+| type            | string                 | yes      |         | should be one of the \SlimBootstrap\Bootstrap::HTTP_METHOD_* constants to define the method you want to match |
+| route           | string                 | yes      |         | pattern for the route to match. See [Route documentation](https://www.slimframework.com/docs/objects/router.html#route-placeholders) of slim for details |
+| name            | string                 | yes      |         | name to identify this (group of) endpoint(s). Used in the ACL handling |
+| instance        | SlimBootstrap\Endpoint | yes      |         | Instance of endpoint class. Has to match the Endpoint interface corresponding to the `$type` used |
+| authentication  | bool                   | no       | true    | It is possible to disable authentication for only one specific endpoint. This flag is used for that |
 
 
 ## Response output
@@ -207,6 +206,16 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
 
  \Monolog\ErrorHandler::register($logger);
 
+$endpoints = [
+    [
+        'type'           => SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
+        'route'          => '/dummy/test/{id:[0-9]+}',
+        'name'           => 'dummy',
+        'instance'       => new DummyApi\Endpoint\V1\Dummy(),
+        'authentication' => false,
+    ],
+];
+
 +$authenticationFactory = new \SlimBootstrap\Authentication\Factory(
 +    new \Http\Caller($logger),
 +    $logger
@@ -215,17 +224,7 @@ This is mapping the clientId "myDummyClientId" to the role "role_dummy" which ha
      $applicationConfig,
      $logger
  );
-
- $slimBootstrap->init();
-
- $slimBootstrap->addEndpoint(
-     SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
-     '/dummy/test/{id:[0-9]+}',
-     'dummy',
-     new \DummyApi\Endpoint\V1\EndpointA()
- );
-
- $slimBootstrap->run();
+ $slimBootstrap->init($endpoints)->run();
 ~~~
 
 ### OAuth
@@ -281,7 +280,7 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
 
 #### Changes to www/index.php
 ~~~diff
- $slimBootstrap         = new \SlimBootstrap\Bootstrap(
+ $slimBootstrap = new \SlimBootstrap\Bootstrap(
      $applicationConfig,
 -    $logger
 +    $logger,

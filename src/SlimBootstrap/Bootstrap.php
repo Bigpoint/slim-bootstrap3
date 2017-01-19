@@ -64,9 +64,13 @@ class Bootstrap
     }
 
     /**
+     * @param array $endpoints
+     *
      * @return SlimBootstrap\Bootstrap
+     *
+     * @throws SlimBootstrap\Exception if the endpoint definition is invalid or no endpoint was defined
      */
-    public function init(): SlimBootstrap\Bootstrap
+    public function init(array $endpoints): SlimBootstrap\Bootstrap
     {
         $this->app = new Slim\App(
             [
@@ -110,6 +114,12 @@ class Bootstrap
 
         $this->registerMiddlewares($this->app);
 
+        if (0 === \count($endpoints)) {
+            throw new SlimBootstrap\Exception('At least one endpoint has to be defined');
+        }
+
+        $this->registerEndpoints($endpoints);
+
         return $this;
     }
 
@@ -121,6 +131,71 @@ class Bootstrap
         $this->app->run();
     }
 
+    private function registerEndpoints(array $endpoints)
+    {
+        for ($i = 0; $i < \count($endpoints); $i += 1) {
+            $endpoint = $endpoints[$i];
+
+            $this->validateEndpoint($i, $endpoint);
+
+            $type           = $endpoint['type'];
+            $route          = $endpoint['route'];
+            $name           = $endpoint['name'];
+            $instance       = $endpoint['instance'];
+            $authentication = true;
+
+            if (true === \array_key_exists('authentication', $endpoint)) {
+                $authentication = $endpoint['authentication'];
+            }
+
+            $this->addEndpoint($type, $route, $name, $instance, $authentication);
+        }
+    }
+
+    /**
+     * @param int   $i
+     * @param array $endpoint
+     *
+     * @throws SlimBootstrap\Exception
+     */
+    private function validateEndpoint(int $i, array $endpoint)
+    {
+        // validate structure
+        if (false === \array_key_exists('type', $endpoint)
+            || true === empty($endpoint['type'])
+            || false === \array_key_exists('route', $endpoint)
+            || true === empty($endpoint['route'])
+            || false === \array_key_exists('name', $endpoint)
+            || true === empty($endpoint['name'])
+            || false === \array_key_exists('instance', $endpoint)
+            || false === \is_object($endpoint['instance'])
+            || (true === \array_key_exists('authenticate', $endpoint)
+                && false === \is_bool($endpoint['authenticate']))
+        ) {
+            throw new SlimBootstrap\Exception(
+                \sprintf(
+                    'endpoint definition #%s has invalid structure',
+                    $i
+                )
+            );
+        }
+
+        // vlaidate implementation
+        $interfaces = \class_implements($endpoint['instance']);
+        $interface  = 'SlimBootstrap\\Endpoint\\' . \ucfirst($endpoint['type']);
+
+        if (false === \array_key_exists($interface, $interfaces)) {
+            throw new SlimBootstrap\Exception(
+                \sprintf(
+                    'endpoint "%s" of endpoint definition #%s is not a valid %s endpoint',
+                    \get_class($endpoint),
+                    $i,
+                    \strtoupper($endpoint['type'])
+                )
+            );
+        }
+    }
+
     /**
      * @param string                 $type           should be one of \SlimBootstrap\Bootstrap::HTTP_METHOD_*
      * @param string                 $route
@@ -129,15 +204,13 @@ class Bootstrap
      * @param bool                   $authentication set this to false if you want no authentication for this endpoint
      *                                               (default: true)
      */
-    public function addEndpoint(
+    private function addEndpoint(
         string $type,
         string $route,
         string $name,
         SlimBootstrap\Endpoint $endpoint,
         bool $authentication = true
     ) {
-        $this->validateEndpoint($type, $endpoint);
-
         $this->authenticationMiddleware->setEndpointAuthentication(\strtoupper($type) . $route, $authentication);
 
         $this->app->$type(
@@ -181,24 +254,6 @@ class Bootstrap
                 return $newResponse;
             }
         )->setName($name);
-    }
-
-    /**
-     * @param string                 $type
-     * @param SlimBootstrap\Endpoint $endpoint
-     *
-     * @throws SlimBootstrap\Exception
-     */
-    private function validateEndpoint(string $type, SlimBootstrap\Endpoint $endpoint)
-    {
-        $interfaces = \class_implements($endpoint);
-        $interface  = 'SlimBootstrap\\Endpoint\\' . \ucfirst($type);
-
-        if (false === \array_key_exists($interface, $interfaces)) {
-            throw new SlimBootstrap\Exception(
-                'endpoint "' . \get_class($endpoint) . '" is not a valid ' . \strtoupper($type) . ' endpoint'
-            );
-        }
     }
 
     /**
