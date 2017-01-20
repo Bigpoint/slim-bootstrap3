@@ -39,8 +39,7 @@ In order to create a REST API based on this framework you need a structure simil
 ~~~
 
 ### config/application.json
-This file holds the main configuration for the implementation of the framework as a JSON. For documentation on the
-`"monolog"` block in there see [MonologCreator](https://github.com/Bigpoint/monolog-creator).
+This file holds the main configuration for the implementation of the framework as a JSON.
 This file doesn't have to be at this location, it is just the default location. If you change it you have to adapt
 the example of the `www/index.php` that is shown later.
 
@@ -49,20 +48,7 @@ The following structure has to be present:
 ~~~json
 {
   "displayErrorDetails": false,
-  "cacheDuration": 900,
-  "monolog": {
-    "handler": {
-      "stream": {
-        "path": "/tmp/my-dummy-api.log"
-      }
-    },
-    "logger": {
-      "_default": {
-        "handler": ["stream"],
-        "level": "DEBUG"
-      }
-    }
-  }
+  "cacheDuration": 900
 }
 ~~~
 
@@ -83,11 +69,6 @@ require(__DIR__ . '/../vendor/autoload.php');
 
 $applicationConfig = \json_decode(\file_get_contents(__DIR__ . '/../config/application.json'), true);
 
-$loggerFactory = new \MonologCreator\Factory($applicationConfig['monolog']);
-$logger        = $loggerFactory->createLogger('dummyApi');
-
-\Monolog\ErrorHandler::register($logger);
-
 $endpoints = [
     [
         'type'           => SlimBootstrap\Bootstrap::HTTP_METHOD_GET,
@@ -98,11 +79,20 @@ $endpoints = [
     ],
 ];
 
-$slimBootstrap = new \SlimBootstrap\Bootstrap(
-    $applicationConfig,
-    $logger
-);
+$slimBootstrap = new \SlimBootstrap\Bootstrap($applicationConfig);
 $slimBootstrap->run($endpoints);
+~~~
+
+
+## Logging
+
+If you want to enable logging for the API, you can inject an instance of
+[`\Monolog\Logger`](https://github.com/Seldaek/monolog/) into the framework by calling the `setLogger()` on the
+instance of the `\SlimBootstrap\Bootstrap` object (this method is chainable):
+
+~~~diff
+-$slimBootstrap->run($endpoints);
++$slimBootstrap->setLogger(new \Monolog\Logger('dummyApi'))run($endpoints);
 ~~~
 
 
@@ -127,7 +117,7 @@ For each of these methods the framework supplies an interface for the endpoints 
 
 ### Registering endpoints to the framework
 The written endpoints have to be registered to the framework and the underlying Slim instance in order to be
-accessible. This is done by passing an array to the `init()` on the `\SlimBootstrap\Bootstrap` instance. The framework
+accessible. This is done by passing an array to the `run()` on the `\SlimBootstrap\Bootstrap` instance. The framework
 is using the basic form of slim to [register a route](https://www.slimframework.com/docs/objects/router.html) and bind
 an endpoint to the route. However at the moment slim-bootstrap3 doesn't allow grouping of endpoints.
 The array has to have the following structure:

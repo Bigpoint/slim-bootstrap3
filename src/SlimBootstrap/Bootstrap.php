@@ -49,15 +49,24 @@ class Bootstrap
     private $authenticationMiddleware = null;
 
     /**
-     * @param array          $applicationConfig
-     * @param Monolog\Logger $logger
+     * @param array $applicationConfig
      */
-    public function __construct(
-        array $applicationConfig,
-        Monolog\Logger $logger
-    ) {
+    public function __construct(array $applicationConfig)
+    {
         $this->applicationConfig = $applicationConfig;
-        $this->logger            = $logger;
+        $this->logger            = new Monolog\Logger('slim-bootstrap3');
+    }
+
+    /**
+     * @param \Monolog\Logger $logger
+     *
+     * @return \SlimBootstrap\Bootstrap
+     */
+    public function setLogger(Monolog\Logger $logger): SlimBootstrap\Bootstrap
+    {
+        $this->logger = $logger;
+
+        return $this;
     }
 
     /**
@@ -98,8 +107,6 @@ class Bootstrap
      * Initiate and run the actual Slim application.
      *
      * @param array $endpoints
-     *
-     * @return SlimBootstrap\Bootstrap
      *
      * @throws SlimBootstrap\Exception if the endpoint definition is invalid or no endpoint was defined
      */
