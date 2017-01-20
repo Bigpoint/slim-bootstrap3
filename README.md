@@ -92,7 +92,7 @@ instance of the `\SlimBootstrap\Bootstrap` object (this method is chainable):
 
 ~~~diff
 -$slimBootstrap->run($endpoints);
-+$slimBootstrap->setLogger(new \Monolog\Logger('dummyApi'))run($endpoints);
++$slimBootstrap->setLogger(new \Monolog\Logger('dummyApi'))->run($endpoints);
 ~~~
 
 
