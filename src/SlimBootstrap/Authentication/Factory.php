@@ -45,9 +45,20 @@ class Factory
             throw new SlimBootstrap\Exception('"oauth" config invalid');
         }
 
+        $oauthConfig   = $config['oauth'];
+        $clientIdField = 'entity_id';
+
+        if (true === \array_key_exists('clientIdField', $oauthConfig)
+            && true === is_string($oauthConfig['clientIdField'])
+            && false === empty($oauthConfig['clientIdField'])
+        ) {
+            $clientIdField = $oauthConfig['clientIdField'];
+        }
+
         return new SlimBootstrap\Authentication\Oauth(
-            $config['oauth']['authenticationUrl'],
-            new \Http\Caller($this->logger),
+            $oauthConfig['authenticationUrl'],
+            $clientIdField,
+            new Http\Caller($this->logger),
             $this->logger
         );
     }
@@ -76,7 +87,7 @@ class Factory
         return new SlimBootstrap\Authentication\Jwt(
             $config['jwt']['providerUrl'],
             $config['jwt']['claims'],
-            new \Http\Caller($this->logger),
+            new Http\Caller($this->logger),
             $this->logger
         );
     }

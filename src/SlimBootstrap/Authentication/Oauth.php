@@ -22,6 +22,11 @@ class Oauth implements SlimBootstrap\Authentication
     private $apiUrl = '';
 
     /**
+     * @var string
+     */
+    private $clientIdField = '';
+
+    /**
      * @var Http\Caller
      */
     private $httpCaller = null;
@@ -32,15 +37,17 @@ class Oauth implements SlimBootstrap\Authentication
     private $logger = null;
 
     /**
-     * @param string         $apiUrl     URL of the oauth authentication service
-     * @param Http\Caller    $httpCaller Caller class to make http calls
-     * @param Monolog\Logger $logger     Logger instance
+     * @param string         $apiUrl        URL of the oauth authentication service
+     * @param string         $clientIdField Name of the field where the clientId can be found in the response
+     * @param Http\Caller    $httpCaller    Caller class to make http calls
+     * @param Monolog\Logger $logger        Logger instance
      */
-    public function __construct(string $apiUrl, Http\Caller $httpCaller, Monolog\Logger $logger)
+    public function __construct(string $apiUrl, string $clientIdField, Http\Caller $httpCaller, Monolog\Logger $logger)
     {
-        $this->apiUrl     = $apiUrl;
-        $this->httpCaller = $httpCaller;
-        $this->logger     = $logger;
+        $this->apiUrl        = $apiUrl;
+        $this->clientIdField = $clientIdField;
+        $this->httpCaller    = $httpCaller;
+        $this->logger        = $logger;
     }
 
     /**
@@ -71,8 +78,9 @@ class Oauth implements SlimBootstrap\Authentication
                 Monolog\Logger::WARNING
             );
         }
+
         return [
-            'clientId' => $result['entity_id'],
+            'clientId' => $result[$this->clientIdField],
             'role'     => '',
         ];
     }

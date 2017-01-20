@@ -195,11 +195,14 @@ fine, access is granted to requester. Otherwise request is aborted with an 401 o
  {
    "displayErrorDetails": false,
 +  "oauth": {
-+    "authenticationUrl": "https://myserver.com/me?access_token="
++    "authenticationUrl": "https://myserver.com/me?access_token=",
++    "clientIdField": "entity_id"
 +  },
    "cacheDuration": 900,
  }
 ~~~
+The `clientIdField` value is optional to define in which field of the result of the Oauth response the clientId can be
+found. The default is "entity_id".
 
 #### Changes to www/index.php
 ~~~diff
