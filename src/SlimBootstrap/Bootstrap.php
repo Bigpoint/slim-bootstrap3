@@ -49,28 +49,61 @@ class Bootstrap
     private $authenticationMiddleware = null;
 
     /**
-     * @param array                               $applicationConfig
-     * @param Monolog\Logger                      $logger
-     * @param string|SlimBootstrap\Authentication $authentication
+     * @param array          $applicationConfig
+     * @param Monolog\Logger $logger
      */
     public function __construct(
         array $applicationConfig,
-        Monolog\Logger $logger,
-        $authentication = null
+        Monolog\Logger $logger
     ) {
         $this->applicationConfig = $applicationConfig;
         $this->logger            = $logger;
-        $this->authentication    = $authentication;
     }
 
     /**
+     * @param string|SlimBootstrap\Authentication $authentication
+     *
+     * @return \SlimBootstrap\Bootstrap
+     *
+     * @throws SlimBootstrap\Exception if the authentication module is invalid
+     */
+    public function setAuthentication($authentication): SlimBootstrap\Bootstrap
+    {
+        if (true === \is_string($authentication)) { // resolve internal authentication method
+            $authenticationFactory = new \SlimBootstrap\Authentication\Factory($this->logger);
+
+            $method = 'create' . \ucfirst($authentication);
+
+            if (false === \method_exists($authenticationFactory, $method)
+                || false === \is_callable([$authenticationFactory, $method])
+            ) {
+                throw new \SlimBootstrap\Exception(\sprintf('auth method "%s" does not exist', $authentication));
+            }
+
+            $this->authentication = $authenticationFactory->$method($this->applicationConfig);
+        } else { // use provided authentication implementation
+            if (!($authentication instanceof SlimBootstrap\Authentication)) {
+                throw new \SlimBootstrap\Exception(
+                    'The authentication module has to implement the \SlimBootstrap\Authentication interface'
+                );
+            }
+
+            $this->authentication = $authentication;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Initiate and run the actual Slim application.
+     *
      * @param array $endpoints
      *
      * @return SlimBootstrap\Bootstrap
      *
      * @throws SlimBootstrap\Exception if the endpoint definition is invalid or no endpoint was defined
      */
-    public function init(array $endpoints): SlimBootstrap\Bootstrap
+    public function run(array $endpoints)
     {
         $this->app = new Slim\App(
             [
@@ -120,14 +153,6 @@ class Bootstrap
 
         $this->registerEndpoints($endpoints);
 
-        return $this;
-    }
-
-    /**
-     * Run the actual Slim application
-     */
-    public function run()
-    {
         $this->app->run();
     }
 
@@ -266,31 +291,6 @@ class Bootstrap
     private function registerMiddlewares(Slim\App $app)
     {
         $middlewareFactory = new SlimBootstrap\Middleware\Factory();
-
-        if (true === \is_string($this->authentication)) {
-            $authenticationFactory = new \SlimBootstrap\Authentication\Factory($this->logger);
-
-            $method = 'create' . \ucfirst($this->authentication);
-
-            if (false === \method_exists($authenticationFactory, $method)
-                || false === \is_callable([$authenticationFactory, $method])
-            ) {
-                throw new \SlimBootstrap\Exception(
-                    \sprintf(
-                        'auth method "%s" does not exist',
-                        $this->authentication
-                    )
-                );
-            }
-
-            $this->authentication = $authenticationFactory->$method($this->applicationConfig);
-
-            if (!($this->authentication instanceof SlimBootstrap\Authentication)) {
-                throw new \SlimBootstrap\Exception(
-                    'The authentication module has to implement the \SlimBootstrap\Authentication interface'
-                );
-            }
-        }
 
         $logMiddleware                  = $middlewareFactory->getLog($this->logger);
         $headerMiddleware               = $middlewareFactory->getHeader();

@@ -102,7 +102,7 @@ $slimBootstrap = new \SlimBootstrap\Bootstrap(
     $applicationConfig,
     $logger
 );
-$slimBootstrap->init($endpoints)->run();
+$slimBootstrap->run($endpoints);
 ~~~
 
 
@@ -213,12 +213,8 @@ fine, access is granted to requester. Otherwise request is aborted with an 401 o
 
 #### Changes to www/index.php
 ~~~diff
- $slimBootstrap = new \SlimBootstrap\Bootstrap(
-     $applicationConfig,
--    $logger
-+    $logger,
-+    'oauth'
- );
+-    $slimBootstrap->run($endpoints);
++    $slimBootstrap->setAuthentication('oauth')->run($endpoints);
 ~~~
 
 ### JWT
@@ -247,18 +243,15 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
 
 #### Changes to www/index.php
 ~~~diff
- $slimBootstrap = new \SlimBootstrap\Bootstrap(
-     $applicationConfig,
--    $logger
-+    $logger,
-+    'jwt'
- );
+-    $slimBootstrap->run($endpoints);
++    $slimBootstrap->setAuthentication('jwt')->run($endpoints);
 ~~~
 
 ### Custom Authentication
 If you want, you can define your own authentication class which for example reads from a database. If you want to do
 this you have to implement the [Authentication interface](https://github.com/Bigpoint/slim-bootstrap3/blob/master/src/SlimBootstrap/Authenticate.php).
-This implementation can passed as last parameter to the `\SlimBootstrap\Bootstrap` constructor instead of the string.
+This implementation can bet used as parameter for the `setAuthentication` call to the `\SlimBootstrap\Bootstrap` objecct
+instead of the string.
 
 
 ## License & Authors
