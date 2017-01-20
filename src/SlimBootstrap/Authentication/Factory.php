@@ -139,22 +139,7 @@ class Factory
             throw new SlimBootstrap\Exception('"jwt" config invalid');
         }
 
-        $jwtConfig        = $config['jwt'];
-        $clientDataClaims = [
-            'clientId' => 'name',
-            'role'     => 'role',
-        ];
-
-        if (true === \array_key_exists('clientDataClaims', $jwtConfig)
-            && true === \is_array($jwtConfig['clientDataClaims'])
-            && true === \array_key_exists('clientId', $jwtConfig['clientDataClaims'])
-            && false === empty($jwtConfig['clientDataClaims']['clientId'])
-            && true === \array_key_exists('role', $jwtConfig['clientDataClaims'])
-            && false === empty($jwtConfig['clientDataClaims']['role'])
-        ) {
-            $clientDataClaims = $jwtConfig['clientDataClaims'];
-        }
-
+        $jwtConfig  = $config['jwt'];
         $encryption = '';
 
         if (true === \array_key_exists('encryption', $jwtConfig)
@@ -167,7 +152,6 @@ class Factory
         return new SlimBootstrap\Authentication\Sombra(
             $jwtConfig['sombraUrl'],
             $encryption,
-            $clientDataClaims,
             $jwtConfig['claims'],
             new Http\Caller($this->logger),
             $this->logger

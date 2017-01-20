@@ -21,7 +21,6 @@ class Sombra extends SlimBootstrap\Authentication\Jwt
     /**
      * @param string          $sombraUrl
      * @param string          $encryption
-     * @param array           $clientDataClaims
      * @param array           $claimsConfig
      * @param \Http\Caller    $httpCaller
      * @param \Monolog\Logger $logger
@@ -29,12 +28,20 @@ class Sombra extends SlimBootstrap\Authentication\Jwt
     public function __construct(
         string $sombraUrl,
         string $encryption,
-        array $clientDataClaims,
         array $claimsConfig,
         Http\Caller $httpCaller,
         Monolog\Logger $logger
     ) {
-        parent::__construct('', $encryption, $clientDataClaims, $claimsConfig, $logger);
+        parent::__construct(
+            '',
+            $encryption,
+            [
+                'clientId' => 'name',
+                'role'     => 'role',
+            ],
+            $claimsConfig,
+            $logger
+        );
 
         $this->sombraUrl  = $sombraUrl;
         $this->httpCaller = $httpCaller;
