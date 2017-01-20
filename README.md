@@ -43,7 +43,7 @@ This file holds the main configuration for the implementation of the framework a
 This file doesn't have to be at this location, it is just the default location. If you change it you have to adapt
 the example of the `www/index.php` that is shown later.
 
-The following structure has to be present:
+The following keys are possible but all optional (shown here with the default values):
 
 ~~~json
 {
@@ -52,22 +52,20 @@ The following structure has to be present:
 }
 ~~~
 
-The `cacheDuration` defines the interval (in seconds) used for the cache expire headers of the response.
+The `cacheDuration` defines the interval (in seconds) used for the cache expire headers of the response (default: 900).
 
 If the `displayErrorDetails` flag is set to true the slim framework will print out a stack trace if an error occurs.
-Otherwise it will just show a "500 Internal Server Error".
+Otherwise it will just show a "500 Internal Server Error" (default: false).
 
 ### the include/ folder
 This folder should contain your endpoint implementation. Read below about how to define an endpoint.
 
 ### www/index.php
-This file is the main entry point for the application. Here is an example how this file should look like:
+This file is the main entry point for the application. Here is a minimum example how this file should look like:
 
 ~~~php
 <?php
 require(__DIR__ . '/../vendor/autoload.php');
-
-$applicationConfig = \json_decode(\file_get_contents(__DIR__ . '/../config/application.json'), true);
 
 $endpoints = [
     [
@@ -79,7 +77,7 @@ $endpoints = [
     ],
 ];
 
-$slimBootstrap = new \SlimBootstrap\Bootstrap($applicationConfig);
+$slimBootstrap = new \SlimBootstrap\Bootstrap();
 $slimBootstrap->run($endpoints);
 ~~~
 
@@ -190,16 +188,16 @@ authentication logic validates this access token against the configured oauth se
 collected clientId from /me endpoint is going to be validated against requested endpoint and configured ACL. If all is
 fine, access is granted to requester. Otherwise request is aborted with an 401 or 403 HTTP status code.
 
-#### Changes in config/application.json
-~~~diff
+#### Additional values for config/application.json
+~~~json
  {
-   "displayErrorDetails": false,
-+  "oauth": {
-+    "authenticationUrl": "https://myserver.com/me?access_token=",
-+    "clientIdField": "entity_id"
-+  },
-   "cacheDuration": 900,
- }
+  ...
+  "oauth": {
+    "authenticationUrl": "https://myserver.com/me?access_token=",
+    "clientIdField": "entity_id"
+  },
+  ...
+}
 ~~~
 The `clientIdField` value is optional to define in which field of the result of the Oauth response the clientId can be
 found. The default is "entity_id".
@@ -219,23 +217,23 @@ After that the framework will extract the clientId from the claim "name" and the
 collected clientId and role are going to be validated against requested endpoint and configured ACL. If all is fine,
 access is granted to requester. Otherwise request is aborted with an 401 or 403 HTTP status code.
 
-#### Changes in config/application.json
-~~~diff
- {
-   "displayErrorDetails": false,
-+  "jwt": {
-+    "publicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElAfxdt6MZxXc4TsZROhm8QPnoDm5\nILVK9el6kU9xd+3Pnb3yOBsLTnuX9/x2c8HIQIoxEs8IlreBQndy3CvRJQ==\n-----END PUBLIC KEY-----\n",
-+    "encryption": "ES256",
-+    "clientDataClaims": {
-+      "clientId": "name",
-+      "role": "role"
-+    },
-+    "claims": {
-+      "issuer": "sombra_development"
-+    }
-+  },
-   "cacheDuration": 900,
- }
+#### Additional values for config/application.json
+~~~json
+{
+  ...
+  "jwt": {
+    "publicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElAfxdt6MZxXc4TsZROhm8QPnoDm5\nILVK9el6kU9xd+3Pnb3yOBsLTnuX9/x2c8HIQIoxEs8IlreBQndy3CvRJQ==\n-----END PUBLIC KEY-----\n",
+    "encryption": "ES256",
+    "clientDataClaims": {
+      "clientId": "name",
+      "role": "role"
+    },
+    "claims": {
+      "issuer": "sombra_development"
+    }
+  },
+  ...
+}
 ~~~
 The `jwt.clientDataClaims` option key is optional and defines in which claims the clientId and role of the user can be
 found. If this key is not specified the fields are "name" for the clientId and "role" for the role.

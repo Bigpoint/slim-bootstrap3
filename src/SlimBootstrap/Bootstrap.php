@@ -51,7 +51,7 @@ class Bootstrap
     /**
      * @param array $applicationConfig
      */
-    public function __construct(array $applicationConfig)
+    public function __construct(array $applicationConfig = [])
     {
         $this->applicationConfig = $applicationConfig;
         $this->logger            = new Monolog\Logger('slim-bootstrap3');
@@ -112,11 +112,19 @@ class Bootstrap
      */
     public function run(array $endpoints)
     {
+        $displayErrorDetails = false;
+
+        if (true === \array_key_exists('displayErrorDetails', $this->applicationConfig)
+            && true === \is_bool($this->applicationConfig['displayErrorDetails'])
+        ) {
+            $displayErrorDetails = $this->applicationConfig['displayErrorDetails'];
+        }
+
         $this->app = new Slim\App(
             [
                 'settings' => [
                     'determineRouteBeforeAppMiddleware' => true,
-                    'displayErrorDetails'               => $this->applicationConfig['displayErrorDetails'],
+                    'displayErrorDetails'               => $displayErrorDetails,
                 ],
             ]
         );
@@ -311,7 +319,7 @@ class Bootstrap
 
         $app->add([$this->outputWriterMiddleware, 'execute']);
         $app->add([$this->authenticationMiddleware, 'execute']);
-        $app->add($middlewareFactory->getCache($this->applicationConfig['cacheDuration']));
+        $app->add($middlewareFactory->getCache($this->applicationConfig));
         $app->add([$middlewareFactory->getHeader($this->applicationConfig), 'execute']);
         $app->add([$middlewareFactory->getLog($this->logger), 'execute']);
     }

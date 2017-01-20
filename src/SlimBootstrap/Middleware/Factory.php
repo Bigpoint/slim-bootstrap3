@@ -78,12 +78,20 @@ class Factory
     }
 
     /**
-     * @param int $cacheDuration
+     * @param array $applicationConfig
      *
      * @return Slim\HttpCache\Cache
      */
-    public function getCache(int $cacheDuration): Slim\HttpCache\Cache
+    public function getCache(array $applicationConfig): Slim\HttpCache\Cache
     {
+        $cacheDuration = 900;
+
+        if (true === \array_key_exists('cacheDuration', $applicationConfig)
+            && true === \is_int($applicationConfig['cacheDuration'])
+        ) {
+            $cacheDuration = $applicationConfig['cacheDuration'];
+        }
+
         return new Slim\HttpCache\Cache('public', $cacheDuration);
     }
 }
