@@ -15,6 +15,11 @@ class Jwt implements SlimBootstrap\Authentication
     private $providerUrl = '';
 
     /**
+     * @var string
+     */
+    private $encryption = '';
+
+    /**
      * @var array
      */
     private $clientDataClaims = [];
@@ -36,6 +41,7 @@ class Jwt implements SlimBootstrap\Authentication
 
     /**
      * @param string         $providerUrl
+     * @param string         $encryption
      * @param array          $clientDataClaims
      * @param array          $claimsConfig
      * @param Http\Caller    $httpCaller
@@ -43,12 +49,14 @@ class Jwt implements SlimBootstrap\Authentication
      */
     public function __construct(
         string $providerUrl,
+        string $encryption,
         array $clientDataClaims,
         array $claimsConfig,
         Http\Caller $httpCaller,
         Monolog\Logger $logger
     ) {
         $this->providerUrl      = $providerUrl;
+        $this->encryption       = $encryption;
         $this->clientDataClaims = $clientDataClaims;
         $this->claimsConfig     = $claimsConfig;
         $this->httpCaller       = $httpCaller;
@@ -145,12 +153,54 @@ class Jwt implements SlimBootstrap\Authentication
      */
     private function verifyToken(Lcobucci\JWT\Token $token, string $publicKey)
     {
-        $signer = new Lcobucci\JWT\Signer\Ecdsa\Sha256();
-        $result = $token->verify($signer, $publicKey);
+        $result = $token->verify($this->determineSigner($this->encryption), $publicKey);
 
         if (false === $result) {
             throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
         }
+    }
+
+    /**
+     * @param string $encryption
+     *
+     * @return Lcobucci\JWT\Signer
+     */
+    private function determineSigner(string $encryptionName): Lcobucci\JWT\Signer
+    {
+        switch ($encryptionName) {
+            case 'HS256':
+                $encryption = new Lcobucci\JWT\Signer\Hmac\Sha256();
+                break;
+            case 'HS384':
+                $encryption = new Lcobucci\JWT\Signer\Hmac\Sha384();
+                break;
+            case 'HS512':
+                $encryption = new Lcobucci\JWT\Signer\Hmac\Sha512();
+                break;
+            case 'RS256':
+                $encryption = new Lcobucci\JWT\Signer\Rsa\Sha256();
+                break;
+            case 'RS384':
+                $encryption = new Lcobucci\JWT\Signer\Rsa\Sha384();
+                break;
+            case 'RS512':
+                $encryption = new Lcobucci\JWT\Signer\Rsa\Sha512();
+                break;
+            case 'ES256':
+                $encryption = new Lcobucci\JWT\Signer\Ecdsa\Sha256();
+                break;
+            case 'ES384':
+                $encryption = new Lcobucci\JWT\Signer\Ecdsa\Sha384();
+                break;
+            case 'ES512':
+                $encryption = new Lcobucci\JWT\Signer\Ecdsa\Sha512();
+                break;
+            default:
+                $encryption = new Lcobucci\JWT\Signer\Ecdsa\Sha256();
+                break;
+        }
+
+        return $encryption;
     }
 
     /**

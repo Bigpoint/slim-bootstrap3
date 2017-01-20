@@ -100,8 +100,18 @@ class Factory
             $clientDataClaims = $jwtConfig['clientDataClaims'];
         }
 
+        $encryption = '';
+
+        if (true === \array_key_exists('encryption', $jwtConfig)
+            && true === \is_string($jwtConfig['encryption'])
+            && false === empty($jwtConfig['encryption'])
+        ) {
+            $encryption = $jwtConfig['encryption'];
+        }
+
         return new SlimBootstrap\Authentication\Jwt(
             $jwtConfig['providerUrl'],
+            $encryption,
             $clientDataClaims,
             $jwtConfig['claims'],
             new Http\Caller($this->logger),

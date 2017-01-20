@@ -226,6 +226,7 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
    "displayErrorDetails": false,
 +  "jwt": {
 +    "providerUrl": "https://my-sombra-instance.com/",
++    "encryption": "ES256",
 +    "clientDataClaims": {
 +      "clientId": "name",
 +      "role": "role"
@@ -239,6 +240,9 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
 ~~~
 The `jwt.clientDataClaims` option key is optional and defines in which claims the clientId and role of the user can be
 found. If this key is not specified the fields are "name" for the clientId and "role" for the role.
+The `jwt.encrpytion` option key is optional and defines which encryption was used to sign the token. If this key is not
+present, the fallback "ES256" is used. This library supports all algorithms that [lcobucci/jwt](https://github.com/lcobucci/jwt)
+version 3.* supports.
 
 #### Changes to www/index.php
 ~~~diff
