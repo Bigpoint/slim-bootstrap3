@@ -17,6 +17,11 @@ class Jwt implements SlimBootstrap\Authentication
     /**
      * @var array
      */
+    private $clientDataClaims = [];
+
+    /**
+     * @var array
+     */
     private $claimsConfig = [];
 
     /**
@@ -31,20 +36,23 @@ class Jwt implements SlimBootstrap\Authentication
 
     /**
      * @param string         $providerUrl
+     * @param array          $clientDataClaims
      * @param array          $claimsConfig
      * @param Http\Caller    $httpCaller
      * @param Monolog\Logger $logger
      */
     public function __construct(
         string $providerUrl,
+        array $clientDataClaims,
         array $claimsConfig,
         Http\Caller $httpCaller,
         Monolog\Logger $logger
     ) {
-        $this->providerUrl  = $providerUrl;
-        $this->claimsConfig = $claimsConfig;
-        $this->httpCaller   = $httpCaller;
-        $this->logger       = $logger;
+        $this->providerUrl      = $providerUrl;
+        $this->clientDataClaims = $clientDataClaims;
+        $this->claimsConfig     = $claimsConfig;
+        $this->httpCaller       = $httpCaller;
+        $this->logger           = $logger;
     }
 
 
@@ -65,8 +73,8 @@ class Jwt implements SlimBootstrap\Authentication
             $this->validateToken($token);
 
             return [
-                'clientId' => $token->getClaim('name'),
-                'role'     => $token->getClaim('role'),
+                'clientId' => $token->getClaim($this->clientDataClaims['clientId']),
+                'role'     => $token->getClaim($this->clientDataClaims['role']),
             ];
         } catch (\InvalidArgumentException $exception) {
             $this->logger->addInfo($exception->getMessage());

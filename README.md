@@ -226,6 +226,10 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
    "displayErrorDetails": false,
 +  "jwt": {
 +    "providerUrl": "https://my-sombra-instance.com/",
++    "clientDataClaims": {
++      "clientId": "name",
++      "role": "role"
++    },
 +    "claims": {
 +      "issuer": "sombra_development"
 +    }
@@ -233,6 +237,8 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
    "cacheDuration": 900,
  }
 ~~~
+The `jwt.clientDataClaims` option key is optional and defines in which claims the clientId and role of the user can be
+found. If this key is not specified the fields are "name" for the clientId and "role" for the role.
 
 #### Changes to www/index.php
 ~~~diff
