@@ -1,3 +1,1 @@
 - move new class declarations from JWT to factory
-- make Access-Allow-Control-Origin header configurable
-- GET parameters in POST or PUT?

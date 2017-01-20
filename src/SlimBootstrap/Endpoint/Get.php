@@ -12,9 +12,10 @@ interface Get extends SlimBootstrap\Endpoint
 {
     /**
      * @param array $routeArguments
+     * @param array $queryParameters
      * @param array $data
      *
      * @return array
      */
-    public function get(array $routeArguments, array $data): array;
+    public function get(array $routeArguments, array $queryParameters, array $data): array;
 }

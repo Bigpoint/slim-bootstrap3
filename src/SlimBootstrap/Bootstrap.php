@@ -60,7 +60,7 @@ class Bootstrap
     /**
      * @param \Monolog\Logger $logger
      *
-     * @return \SlimBootstrap\Bootstrap
+     * @return SlimBootstrap\Bootstrap
      */
     public function setLogger(Monolog\Logger $logger): SlimBootstrap\Bootstrap
     {
@@ -72,27 +72,27 @@ class Bootstrap
     /**
      * @param string|SlimBootstrap\Authentication $authentication
      *
-     * @return \SlimBootstrap\Bootstrap
+     * @return SlimBootstrap\Bootstrap
      *
      * @throws SlimBootstrap\Exception if the authentication module is invalid
      */
     public function setAuthentication($authentication): SlimBootstrap\Bootstrap
     {
         if (true === \is_string($authentication)) { // resolve internal authentication method
-            $authenticationFactory = new \SlimBootstrap\Authentication\Factory($this->logger);
+            $authenticationFactory = new SlimBootstrap\Authentication\Factory($this->logger);
 
             $method = 'create' . \ucfirst($authentication);
 
             if (false === \method_exists($authenticationFactory, $method)
                 || false === \is_callable([$authenticationFactory, $method])
             ) {
-                throw new \SlimBootstrap\Exception(\sprintf('auth method "%s" does not exist', $authentication));
+                throw new SlimBootstrap\Exception(\sprintf('auth method "%s" does not exist', $authentication));
             }
 
             $this->authentication = $authenticationFactory->$method($this->applicationConfig);
         } else { // use provided authentication implementation
             if (!($authentication instanceof SlimBootstrap\Authentication)) {
-                throw new \SlimBootstrap\Exception(
+                throw new SlimBootstrap\Exception(
                     'The authentication module has to implement the \SlimBootstrap\Authentication interface'
                 );
             }
@@ -147,7 +147,7 @@ class Bootstrap
                 );
 
                 return $response->withStatus($code)
-                    ->withHeader('Content-Type', 'text/html')
+                    ->withAddedHeader('Content-Type', 'text/html')
                     ->write($exception->getMessage());
             };
         };
@@ -163,6 +163,9 @@ class Bootstrap
         $this->app->run();
     }
 
+    /**
+     * @param array $endpoints
+     */
     private function registerEndpoints(array $endpoints)
     {
         for ($i = 0; $i < \count($endpoints); $i += 1) {
@@ -278,7 +281,7 @@ class Bootstrap
                 }
 
 
-                $data = $endpoint->$type($routeArguments, $data);
+                $data = $endpoint->$type($routeArguments, $request->getQueryParams(), $data);
 
                 $outputWriter = $request->getAttribute('outputWriter');
                 $newResponse  = $outputWriter->write($response, $data);
@@ -299,8 +302,6 @@ class Bootstrap
     {
         $middlewareFactory = new SlimBootstrap\Middleware\Factory();
 
-        $logMiddleware                  = $middlewareFactory->getLog($this->logger);
-        $headerMiddleware               = $middlewareFactory->getHeader();
         $this->outputWriterMiddleware   = $middlewareFactory->getOutputWriter();
         $this->authenticationMiddleware = $middlewareFactory->getAuthentication(
             $this->logger,
@@ -311,7 +312,7 @@ class Bootstrap
         $app->add([$this->outputWriterMiddleware, 'execute']);
         $app->add([$this->authenticationMiddleware, 'execute']);
         $app->add($middlewareFactory->getCache($this->applicationConfig['cacheDuration']));
-        $app->add([$headerMiddleware, 'execute']);
-        $app->add([$logMiddleware, 'execute']);
+        $app->add([$middlewareFactory->getHeader($this->applicationConfig), 'execute']);
+        $app->add([$middlewareFactory->getLog($this->logger), 'execute']);
     }
 }

@@ -13,6 +13,21 @@ use \Slim;
 class Header implements SlimBootstrap\Middleware
 {
     /**
+     * @var array
+     */
+    private $headers = [];
+
+    /**
+     * Header constructor.
+     *
+     * @param array $headers
+     */
+    public function __construct(array $headers)
+    {
+        $this->headers = $headers;
+    }
+
+    /**
      * @param Message\ServerRequestInterface $request
      * @param Slim\Http\Response             $response
      * @param callable                       $next
@@ -24,7 +39,9 @@ class Header implements SlimBootstrap\Middleware
         Slim\Http\Response $response,
         callable $next
     ): Message\ResponseInterface {
-        $response = $response->withAddedHeader('Access-Control-Allow-Origin', '*');
+        foreach ($this->headers as $key => $value) {
+            $response = $response->withAddedHeader($key, $value);
+        }
 
         return $next($request, $response);
     }

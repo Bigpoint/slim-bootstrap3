@@ -23,11 +23,21 @@ class Factory
     }
 
     /**
+     * @param array $applicationConfig
+     *
      * @return SlimBootstrap\Middleware\Header
      */
-    public function getHeader(): SlimBootstrap\Middleware\Header
+    public function getHeader(array $applicationConfig): SlimBootstrap\Middleware\Header
     {
-        return new SlimBootstrap\Middleware\Header();
+        $headers = [];
+
+        if (true === \array_key_exists('headers', $applicationConfig)
+            && true === \is_array($applicationConfig['headers'])
+        ) {
+            $headers = $applicationConfig['headers'];
+        }
+
+        return new SlimBootstrap\Middleware\Header($headers);
     }
 
     /**
@@ -50,7 +60,7 @@ class Factory
     public function getAuthentication(
         Monolog\Logger $logger,
         SlimBootstrap\Authentication $authentication = null,
-        array $applicationConfig = []
+        array $applicationConfig
     ): SlimBootstrap\Middleware\Authentication {
         $aclConfig = [];
 

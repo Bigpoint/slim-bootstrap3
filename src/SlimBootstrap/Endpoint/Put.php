@@ -12,9 +12,10 @@ interface Put extends SlimBootstrap\Endpoint
 {
     /**
      * @param array $routeArguments
+     * @param array $queryParameters
      * @param array $data
      *
      * @return array
      */
-    public function put(array $routeArguments, array $data): array;
+    public function put(array $routeArguments, array $queryParameters, array $data): array;
 }
