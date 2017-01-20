@@ -91,7 +91,7 @@ class Authentication implements SlimBootstrap\Middleware
                 throw new SlimBootstrap\Exception('acl config is empty or invalid', 500);
             }
 
-            $this->logger->addInfo('using authentication');
+            $this->logger->addInfo('using authentication: ' . get_class($this->authentication));
 
             $clientData = $this->authentication->authenticate($request);
             $clientId   = $clientData['clientId'];

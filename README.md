@@ -249,6 +249,10 @@ version 3.* supports.
 +    $slimBootstrap->setAuthentication('jwt')->run($endpoints);
 ~~~
 
+### Sombra
+This is an JWT provider specifically written to work with a [Sombra](https://github.com/bigpoint/sombra) instance. It
+does the same as the normal JWT provider but it reads the public key from the provided `jwt.sombraUrl` host.
+
 ### Custom Authentication
 If you want, you can define your own authentication class which for example reads from a database. If you want to do
 this you have to implement the [Authentication interface](https://github.com/Bigpoint/slim-bootstrap3/blob/master/src/SlimBootstrap/Authenticate.php).

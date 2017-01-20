@@ -1,7 +1,6 @@
 <?php
 namespace SlimBootstrap\Authentication;
 
-use \Http;
 use \Lcobucci;
 use \Monolog;
 use \Psr\Http\Message;
@@ -30,11 +29,6 @@ class Jwt implements SlimBootstrap\Authentication
     private $claimsConfig = [];
 
     /**
-     * @var Http\Caller
-     */
-    private $httpCaller = null;
-
-    /**
      * @var Monolog\Logger
      */
     private $logger = null;
@@ -44,7 +38,6 @@ class Jwt implements SlimBootstrap\Authentication
      * @param string         $encryption
      * @param array          $clientDataClaims
      * @param array          $claimsConfig
-     * @param Http\Caller    $httpCaller
      * @param Monolog\Logger $logger
      */
     public function __construct(
@@ -52,14 +45,12 @@ class Jwt implements SlimBootstrap\Authentication
         string $encryption,
         array $clientDataClaims,
         array $claimsConfig,
-        Http\Caller $httpCaller,
         Monolog\Logger $logger
     ) {
         $this->publicKey        = $publicKey;
         $this->encryption       = $encryption;
         $this->clientDataClaims = $clientDataClaims;
         $this->claimsConfig     = $claimsConfig;
-        $this->httpCaller       = $httpCaller;
         $this->logger           = $logger;
     }
 
@@ -96,7 +87,7 @@ class Jwt implements SlimBootstrap\Authentication
      *
      * @throws SlimBootstrap\Exception
      */
-    private function getPublicKey(): string
+    protected function getPublicKey(): string
     {
         return $this->publicKey;
     }
@@ -130,11 +121,11 @@ class Jwt implements SlimBootstrap\Authentication
     }
 
     /**
-     * @param string $encryption
+     * @param string $encryptionName
      *
      * @return Lcobucci\JWT\Signer
      */
-    private function determineSigner(string $encryptionName): Lcobucci\JWT\Signer
+    protected function determineSigner(string $encryptionName): Lcobucci\JWT\Signer
     {
         switch ($encryptionName) {
             case 'HS256':

@@ -114,6 +114,61 @@ class Factory
             $encryption,
             $clientDataClaims,
             $jwtConfig['claims'],
+            $this->logger
+        );
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return SlimBootstrap\Authentication\Sombra
+     *
+     * @throws SlimBootstrap\Exception if "jwt" or "sombra" config is invalid
+     */
+    public function createSombra(array $config): SlimBootstrap\Authentication\Sombra
+    {
+        if (false === \array_key_exists('jwt', $config)
+            || false === \is_array($config['jwt'])
+            || false === \array_key_exists('sombraUrl', $config['jwt'])
+            || false === \is_string($config['jwt']['sombraUrl'])
+            || true === empty($config['jwt']['sombraUrl'])
+            || false === \array_key_exists('claims', $config['jwt'])
+            || false === \is_array($config['jwt']['claims'])
+            || 0 === \count($config['jwt']['claims'])
+        ) {
+            throw new SlimBootstrap\Exception('"jwt" config invalid');
+        }
+
+        $jwtConfig        = $config['jwt'];
+        $clientDataClaims = [
+            'clientId' => 'name',
+            'role'     => 'role',
+        ];
+
+        if (true === \array_key_exists('clientDataClaims', $jwtConfig)
+            && true === \is_array($jwtConfig['clientDataClaims'])
+            && true === \array_key_exists('clientId', $jwtConfig['clientDataClaims'])
+            && false === empty($jwtConfig['clientDataClaims']['clientId'])
+            && true === \array_key_exists('role', $jwtConfig['clientDataClaims'])
+            && false === empty($jwtConfig['clientDataClaims']['role'])
+        ) {
+            $clientDataClaims = $jwtConfig['clientDataClaims'];
+        }
+
+        $encryption = '';
+
+        if (true === \array_key_exists('encryption', $jwtConfig)
+            && true === \is_string($jwtConfig['encryption'])
+            && false === empty($jwtConfig['encryption'])
+        ) {
+            $encryption = $jwtConfig['encryption'];
+        }
+
+        return new SlimBootstrap\Authentication\Sombra(
+            $jwtConfig['sombraUrl'],
+            $encryption,
+            $clientDataClaims,
+            $jwtConfig['claims'],
             new Http\Caller($this->logger),
             $this->logger
         );
