@@ -12,7 +12,7 @@ class Jwt implements SlimBootstrap\Authentication
     /**
      * @var string
      */
-    private $providerUrl = '';
+    private $publicKey = '';
 
     /**
      * @var string
@@ -40,7 +40,7 @@ class Jwt implements SlimBootstrap\Authentication
     private $logger = null;
 
     /**
-     * @param string         $providerUrl
+     * @param string         $publicKey
      * @param string         $encryption
      * @param array          $clientDataClaims
      * @param array          $claimsConfig
@@ -48,14 +48,14 @@ class Jwt implements SlimBootstrap\Authentication
      * @param Monolog\Logger $logger
      */
     public function __construct(
-        string $providerUrl,
+        string $publicKey,
         string $encryption,
         array $clientDataClaims,
         array $claimsConfig,
         Http\Caller $httpCaller,
         Monolog\Logger $logger
     ) {
-        $this->providerUrl      = $providerUrl;
+        $this->publicKey        = $publicKey;
         $this->encryption       = $encryption;
         $this->clientDataClaims = $clientDataClaims;
         $this->claimsConfig     = $claimsConfig;
@@ -98,38 +98,7 @@ class Jwt implements SlimBootstrap\Authentication
      */
     private function getPublicKey(): string
     {
-        $result = $this->httpCaller->get($this->providerUrl);
-
-        if (200 !== $result['responseCode']) {
-            throw new SlimBootstrap\Exception(
-                \sprintf(
-                    'provider returned invalid response: %s - %s',
-                    $result['responseCode'],
-                    \var_export($result['body'], true)
-                ),
-                401,
-                Monolog\Logger::ERROR
-            );
-        }
-
-        $data = \json_decode($result['body'], true);
-
-        if (false === \is_array($data)
-            || false === \array_key_exists('Pubkey', $data)
-            || true === empty($data['Pubkey'])
-        ) {
-            throw new SlimBootstrap\Exception(
-                \sprintf(
-                    'provider returned invalid result: %s - %s',
-                    $result['responseCode'],
-                    \var_export($result['body'], true)
-                ),
-                401,
-                Monolog\Logger::ERROR
-            );
-        }
-
-        return $data['Pubkey'];
+        return $this->publicKey;
     }
 
     /**

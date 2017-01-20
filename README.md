@@ -212,9 +212,8 @@ found. The default is "entity_id".
 
 ### JWT
 You have to add the JWT as an authorization bearer header to the request of the API. The framework will verify and
-validate the JWT with the public key from the JWT provider. For the validation all fields from the config's `jwt.claims`
-block have to match with the JWT. The public key of the JWT provider is currently expacted to be located on the "/"
-endpoint in the json field `Pubkey`.
+validate the JWT with the public key from the JWT provider provided in `jwt.publicKey`. For the validation all fields
+from the config's `jwt.claims` block have to match with the JWT.
 
 After that the framework will extract the clientId from the claim "name" and the role from the "role" claim. Next the
 collected clientId and role are going to be validated against requested endpoint and configured ACL. If all is fine,
@@ -225,7 +224,7 @@ access is granted to requester. Otherwise request is aborted with an 401 or 403 
  {
    "displayErrorDetails": false,
 +  "jwt": {
-+    "providerUrl": "https://my-sombra-instance.com/",
++    "publicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElAfxdt6MZxXc4TsZROhm8QPnoDm5\nILVK9el6kU9xd+3Pnb3yOBsLTnuX9/x2c8HIQIoxEs8IlreBQndy3CvRJQ==\n-----END PUBLIC KEY-----\n",
 +    "encryption": "ES256",
 +    "clientDataClaims": {
 +      "clientId": "name",

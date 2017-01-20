@@ -74,9 +74,9 @@ class Factory
     {
         if (false === \array_key_exists('jwt', $config)
             || false === \is_array($config['jwt'])
-            || false === \array_key_exists('providerUrl', $config['jwt'])
-            || false === \is_string($config['jwt']['providerUrl'])
-            || true === empty($config['jwt']['providerUrl'])
+            || false === \array_key_exists('publicKey', $config['jwt'])
+            || false === \is_string($config['jwt']['publicKey'])
+            || true === empty($config['jwt']['publicKey'])
             || false === \array_key_exists('claims', $config['jwt'])
             || false === \is_array($config['jwt']['claims'])
             || 0 === \count($config['jwt']['claims'])
@@ -110,7 +110,7 @@ class Factory
         }
 
         return new SlimBootstrap\Authentication\Jwt(
-            $jwtConfig['providerUrl'],
+            $jwtConfig['publicKey'],
             $encryption,
             $clientDataClaims,
             $jwtConfig['claims'],
