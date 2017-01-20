@@ -99,7 +99,7 @@ class Authentication implements SlimBootstrap\Middleware
 
             $this->logger->addInfo('authentication successfull: ' . \var_export($clientData, true));
 
-            if (2 === \count($clientData)) {
+            if (false === empty($clientData['role'])) {
                 $this->acl->accessRole($clientData['role'], $routeName);
             } else {
                 $this->acl->access($clientId, $routeName);
