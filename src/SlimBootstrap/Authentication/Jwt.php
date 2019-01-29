@@ -116,7 +116,11 @@ class Jwt implements SlimBootstrap\Authentication
         $result = $token->verify($this->determineSigner($this->encryption), $publicKey);
 
         if (false === $result) {
-            throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
+            throw new SlimBootstrap\Exception(
+                'JWT signature invalid',
+                401,
+                Monolog\Logger::INFO
+            );
         }
     }
 
@@ -183,7 +187,11 @@ class Jwt implements SlimBootstrap\Authentication
         $result = $token->validate($data);
 
         if (false === $result) {
-            throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
+            throw new SlimBootstrap\Exception(
+                'JWT validation failed',
+                401,
+                Monolog\Logger::INFO
+            );
         }
     }
 }
