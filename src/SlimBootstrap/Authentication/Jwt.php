@@ -75,7 +75,7 @@ class Jwt implements SlimBootstrap\Authentication
                 'clientId' => $token->getClaim($this->clientDataClaims['clientId']),
                 'role'     => $token->getClaim($this->clientDataClaims['role']),
             ];
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\Throwable $exception) {
             $this->logger->addInfo($exception->getMessage());
 
             throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
