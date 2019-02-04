@@ -91,13 +91,28 @@ class Authentication implements SlimBootstrap\Middleware
                 throw new SlimBootstrap\Exception('acl config is empty or invalid', 500);
             }
 
-            $this->logger->addInfo('using authentication: ' . get_class($this->authentication));
+            $authenticationMethod = \get_class($this->authentication);
+
+            $this->logger->addInfo(
+                'authentication-usage',
+                [
+                    'method' => $authenticationMethod,
+                ]
+            );
 
             $clientData = $this->authentication->authenticate($request);
             $clientId   = $clientData['clientId'];
             $routeName  = $currentRoute->getName();
 
-            $this->logger->addInfo('authentication successfull: ' . \var_export($clientData, true));
+            $this->logger->addInfo(
+                'authentication-successfull',
+                [
+                    'method'     => $authenticationMethod,
+                    'clientId'   => $clientId,
+                    'routeName'  => $routeName,
+                    'clientData' => \var_export($clientData, true),
+                ]
+            );
 
             if (false === empty($clientData['role'])) {
                 $this->acl->accessRole($clientData['role'], $routeName);
