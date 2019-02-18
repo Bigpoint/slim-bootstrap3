@@ -8,11 +8,6 @@ use \SlimBootstrap;
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Http\Caller|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $httpCallerMock = null;
-
-    /**
      * @var Monolog\Logger|\PHPUnit_Framework_MockObject_MockObject
      */
     private $loggerMock = null;
@@ -26,16 +21,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->httpCallerMock = $this->getMockBuilder('\Http\Caller')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->loggerMock = $this->getMockBuilder('\Monolog\Logger')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->authenticationFactory = new SlimBootstrap\Authentication\Factory(
-            $this->httpCallerMock,
             $this->loggerMock
         );
     }
@@ -102,9 +92,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $actual = $this->authenticationFactory->createJwt(
             [
                 'jwt' => [
-                    'providerUrl' => 'mockUrl',
-                    'claims'      => [
-                        'issuer' => 'sombra_developer',
+                    'publicKey' => 'mockSecret',
+                    'claims'    => [
+                        'issuer' => 'mockIssuer',
                     ],
                 ]
             ]

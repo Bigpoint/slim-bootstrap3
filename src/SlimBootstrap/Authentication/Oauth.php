@@ -19,35 +19,47 @@ class Oauth implements SlimBootstrap\Authentication
      *
      * @var string
      */
-    private $apiUrl = '';
+    private $apiUrl;
 
     /**
      * @var string
      */
-    private $clientIdField = '';
+    private $clientIdField;
+
+    /**
+     * @var string
+     */
+    private $tokenParameter;
 
     /**
      * @var Http\Caller
      */
-    private $httpCaller = null;
+    private $httpCaller;
 
     /**
      * @var Monolog\Logger
      */
-    private $logger = null;
+    private $logger;
 
     /**
-     * @param string         $apiUrl        URL of the oauth authentication service
-     * @param string         $clientIdField Name of the field where the clientId can be found in the response
-     * @param Http\Caller    $httpCaller    Caller class to make http calls
-     * @param Monolog\Logger $logger        Logger instance
+     * @param string         $apiUrl         URL of the oauth authentication service
+     * @param string         $clientIdField  Name of the field where the clientId can be found in the response
+     * @param string         $tokenParameter Name of the get parameter where the token is located
+     * @param Http\Caller    $httpCaller     Caller class to make http calls
+     * @param Monolog\Logger $logger         Logger instance
      */
-    public function __construct(string $apiUrl, string $clientIdField, Http\Caller $httpCaller, Monolog\Logger $logger)
-    {
-        $this->apiUrl        = $apiUrl;
-        $this->clientIdField = $clientIdField;
-        $this->httpCaller    = $httpCaller;
-        $this->logger        = $logger;
+    public function __construct(
+        string $apiUrl,
+        string $clientIdField,
+        string $tokenParameter,
+        Http\Caller $httpCaller,
+        Monolog\Logger $logger
+    ) {
+        $this->apiUrl         = $apiUrl;
+        $this->clientIdField  = $clientIdField;
+        $this->tokenParameter = $tokenParameter;
+        $this->httpCaller     = $httpCaller;
+        $this->logger         = $logger;
     }
 
     /**
@@ -70,7 +82,7 @@ class Oauth implements SlimBootstrap\Authentication
         $result = \json_decode($result['body'], true);
 
         if (false === \is_array($result)
-            || false === \array_key_exists('entity_id', $result)
+            || false === \array_key_exists($this->clientIdField, $result)
         ) {
             throw new SlimBootstrap\Exception(
                 'Access token invalid',
@@ -92,8 +104,8 @@ class Oauth implements SlimBootstrap\Authentication
      */
     private function determineToken(array $queryParameters): string
     {
-        if (true === \array_key_exists('access_token', $queryParameters)) {
-            return $queryParameters['access_token'];
+        if (true === \array_key_exists($this->tokenParameter, $queryParameters)) {
+            return $queryParameters[$this->tokenParameter];
         }
 
         return '';

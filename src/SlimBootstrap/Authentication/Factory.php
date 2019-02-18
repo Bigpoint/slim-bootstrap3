@@ -55,9 +55,19 @@ class Factory
             $clientIdField = $oauthConfig['clientIdField'];
         }
 
+        $tokenParameter = 'access_token';
+
+        if (true === \array_key_exists('tokenParameter', $oauthConfig)
+            && true === is_string($oauthConfig['tokenParameter'])
+            && false === empty($oauthConfig['tokenParameter'])
+        ) {
+            $tokenParameter = $oauthConfig['tokenParameter'];
+        }
+
         return new SlimBootstrap\Authentication\Oauth(
             $oauthConfig['authenticationUrl'],
             $clientIdField,
+            $tokenParameter,
             new Http\Caller($this->logger),
             $this->logger
         );
