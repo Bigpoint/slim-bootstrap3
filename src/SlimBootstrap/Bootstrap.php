@@ -180,7 +180,7 @@ class Bootstrap
     {
         $endpoints[] = [
             'type'     => self::HTTP_METHOD_GET,
-            'route'    => 'info',
+            'route'    => '/info',
             'name'     => 'info',
             'instance' => new SlimBootstrap\Endpoint\Info(),
         ];
