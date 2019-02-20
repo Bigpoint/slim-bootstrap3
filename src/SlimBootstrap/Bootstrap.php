@@ -104,11 +104,11 @@ class Bootstrap
     }
 
     /**
-     * Initiate and run the actual Slim application.
-     *
      * @param array $endpoints
      *
-     * @throws SlimBootstrap\Exception if the endpoint definition is invalid or no endpoint was defined
+     * @throws Exception
+     * @throws Slim\Exception\MethodNotAllowedException
+     * @throws Slim\Exception\NotFoundException
      */
     public function run(array $endpoints)
     {
@@ -173,9 +173,18 @@ class Bootstrap
 
     /**
      * @param array $endpoints
+     *
+     * @throws Exception
      */
     private function registerEndpoints(array $endpoints)
     {
+        $endpoints[] = [
+            'type'     => self::HTTP_METHOD_GET,
+            'route'    => 'info',
+            'name'     => 'info',
+            'instance' => new SlimBootstrap\Endpoint\Info(),
+        ];
+
         for ($i = 0; $i < \count($endpoints); $i += 1) {
             $endpoint = $endpoints[$i];
 
