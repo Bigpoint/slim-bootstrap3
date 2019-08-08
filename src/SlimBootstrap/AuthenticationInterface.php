@@ -9,7 +9,7 @@ use \SlimBootstrap;
  *
  * @package SlimBootstrap
  */
-interface Authentication
+interface AuthenticationInterface
 {
     /**
      * @param Message\ServerRequestInterface $request The object holding information about the current request.

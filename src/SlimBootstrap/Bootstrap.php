@@ -24,7 +24,7 @@ class Bootstrap
     private $applicationConfig = [];
 
     /**
-     * @var SlimBootstrap\Authentication|string
+     * @var SlimBootstrap\AuthenticationInterface|string
      */
     private $authentication = null;
 
@@ -70,7 +70,7 @@ class Bootstrap
     }
 
     /**
-     * @param string|SlimBootstrap\Authentication $authentication
+     * @param string|SlimBootstrap\AuthenticationInterface $authentication
      *
      * @return SlimBootstrap\Bootstrap
      *
@@ -91,7 +91,7 @@ class Bootstrap
 
             $this->authentication = $authenticationFactory->$method($this->applicationConfig);
         } else { // use provided authentication implementation
-            if (!($authentication instanceof SlimBootstrap\Authentication)) {
+            if (!($authentication instanceof SlimBootstrap\AuthenticationInterface)) {
                 throw new SlimBootstrap\Exception(
                     'The authentication module has to implement the \SlimBootstrap\Authentication interface'
                 );

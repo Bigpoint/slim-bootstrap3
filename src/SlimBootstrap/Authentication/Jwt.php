@@ -6,7 +6,7 @@ use \Monolog;
 use \Psr\Http\Message;
 use \SlimBootstrap;
 
-class Jwt implements SlimBootstrap\Authentication
+class Jwt implements SlimBootstrap\AuthenticationInterface
 {
     /**
      * @var string
