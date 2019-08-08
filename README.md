@@ -253,7 +253,7 @@ does the same as the normal JWT provider but it reads the public key from the pr
 
 ### Custom Authentication
 If you want, you can define your own authentication class which for example reads from a database. If you want to do
-this you have to implement the [Authentication interface](https://github.com/Bigpoint/slim-bootstrap3/blob/master/src/SlimBootstrap/Authenticate.php).
+this you have to implement the [Authentication interface](https://github.com/Bigpoint/slim-bootstrap3/blob/master/src/SlimBootstrap/AuthenticateInterface.php).
 This implementation can bet used as parameter for the `setAuthentication` call to the `\SlimBootstrap\Bootstrap` objecct
 instead of the string.
 

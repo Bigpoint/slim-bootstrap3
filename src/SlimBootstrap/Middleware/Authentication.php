@@ -24,7 +24,7 @@ class Authentication implements SlimBootstrap\Middleware
     private $acl = null;
 
     /**
-     * @var SlimBootstrap\Authentication
+     * @var SlimBootstrap\AuthenticationInterface
      */
     private $authentication = null;
 
@@ -38,14 +38,14 @@ class Authentication implements SlimBootstrap\Middleware
     private $endpointAuthentication = [];
 
     /**
-     * @param Monolog\Logger               $logger
-     * @param SlimBootstrap\Acl            $acl
-     * @param SlimBootstrap\Authentication $authentication
+     * @param Monolog\Logger                        $logger
+     * @param SlimBootstrap\Acl                     $acl
+     * @param SlimBootstrap\AuthenticationInterface $authentication
      */
     public function __construct(
         Monolog\Logger $logger,
         SlimBootstrap\Acl $acl,
-        SlimBootstrap\Authentication $authentication = null
+        SlimBootstrap\AuthenticationInterface $authentication = null
     ) {
         $this->logger         = $logger;
         $this->acl            = $acl;

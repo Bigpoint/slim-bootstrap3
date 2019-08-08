@@ -12,7 +12,7 @@ use \SlimBootstrap;
  *
  * @package SlimBootstrap\Authentication
  */
-class Oauth implements SlimBootstrap\Authentication
+class Oauth implements SlimBootstrap\AuthenticationInterface
 {
     /**
      * URL of the oauth authentication service.
