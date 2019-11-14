@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.1
+- understand "Bearer" and "bearer" in `Authorization` header for JWT authentications.
+
 ## 2.0.0
 - renamed `\SlimBootstrap\Authentication.php` to `\SlimBootstrap\AuthenticationInterface.php` to avoid autoloader issues. **If you have custom authentication classes you need to change the interface it implements**
 

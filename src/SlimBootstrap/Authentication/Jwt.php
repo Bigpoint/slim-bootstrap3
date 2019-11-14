@@ -99,7 +99,7 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
      */
     private function getToken(Message\ServerRequestInterface $request): Lcobucci\JWT\Token
     {
-        $tokenString = \str_replace('bearer ', '', $request->getHeaderLine('Authorization'));
+        $tokenString = \str_ireplace('bearer ', '', $request->getHeaderLine('Authorization'));
         $jwtParser   = new Lcobucci\JWT\Parser();
 
         return $jwtParser->parse($tokenString);
