@@ -24,12 +24,12 @@
   },
   "suggest": {
     "ext-gmp": "needed for JWT support",
-    "lcobucci/jwt": "needed for JWT support (3.*)",
+    "lcobucci/jwt": "needed for JWT support (3.4.*)",
     "mdanter/ecc": "needed for JWT support (0.3.*)"
   },
   "require-dev": {
     "ext-gmp": "*",
-    "lcobucci/jwt": "3.*",
+    "lcobucci/jwt": "3.4.*",
     "mdanter/ecc": "0.3.*",
     "phpunit/phpunit": "5.*"
   },
