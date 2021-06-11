@@ -242,7 +242,7 @@ version 3.* supports.
 The `jwt.clientDataClaims` option key is optional and defines in which claims the clientId and role of the user can be
 found. If this key is not specified the fields are "name" for the clientId and "role" for the role.
 
-The `jwt.claims` settins are used to validate the content of a token. Following constrains values from [lcobucci/jwt](https://lcobucci-jwt.readthedocs.io/en/3.4.x/validating-tokens/#available-constraints) are supported:
+The `jwt.claims` settings are used to validate the content of a token. Following constrains values from [lcobucci/jwt](https://lcobucci-jwt.readthedocs.io/en/3.4.x/validating-tokens/#available-constraints) are supported:
  - `audience` - Lcobucci\JWT\Validation\Constraint\PermittedFor
  - `issuer` - Lcobucci\JWT\Validation\Constraint\IssuedBy
 

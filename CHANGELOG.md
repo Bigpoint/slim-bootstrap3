@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.2
+- adjusted JWT auth to avoid deprecated warnings with Lcobucci\JWT >3.4
+
 ## 2.0.1
 - understand "Bearer" and "bearer" in `Authorization` header for JWT authentications.
 
