@@ -1,10 +1,11 @@
 <?php
+
 namespace SlimBootstrap\Authentication;
 
-use \Lcobucci;
-use \Monolog;
-use \Psr\Http\Message;
-use \SlimBootstrap;
+use Lcobucci;
+use Monolog;
+use Psr\Http\Message;
+use SlimBootstrap;
 
 class Jwt implements SlimBootstrap\AuthenticationInterface
 {
@@ -54,7 +55,6 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
         $this->logger           = $logger;
     }
 
-
     /**
      * @param Message\ServerRequestInterface $request The object holding information about the current request.
      *
@@ -64,19 +64,29 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
      */
     public function authenticate(Message\ServerRequestInterface $request): array
     {
-        try {
-            $publicKey = $this->getPublicKey();
-            $token     = $this->getToken($request);
+        $jwtConfig = Lcobucci\JWT\Configuration::forAsymmetricSigner(
+            $this->determineSigner($this->encryption),
+            Lcobucci\JWT\Signer\Key\InMemory::plainText(''), // setting signKey empty, as we only verify tokens here
+            Lcobucci\JWT\Signer\Key\InMemory::plainText($this->getPublicKey())
+        );
+        $jwtConfig->setValidationConstraints(...$this->evaluateJwtContstrains());
 
-            $this->verifyToken($token, $publicKey);
-            $this->validateToken($token);
+        try {
+            $tokenString = \str_ireplace('bearer ', '', $request->getHeaderLine('Authorization'));
+            $token       = $jwtConfig->parser()->parse($tokenString);
+
+
+            $jwtConfig->validator()->assert(
+                $token,
+                ...$jwtConfig->validationConstraints()
+            );
 
             return [
-                'clientId' => $token->getClaim($this->clientDataClaims['clientId']),
-                'role'     => $token->getClaim($this->clientDataClaims['role']),
+                'clientId' => $token->claims()->get($this->clientDataClaims['clientId']),
+                'role'     => $token->claims()->get($this->clientDataClaims['role']),
             ];
         } catch (\Throwable $exception) {
-            $this->logger->addInfo($exception->getMessage());
+            $this->logger->addWarning($exception->getMessage());
 
             throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
         }
@@ -90,38 +100,6 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
     protected function getPublicKey(): string
     {
         return $this->publicKey;
-    }
-
-    /**
-     * @param Message\ServerRequestInterface $request
-     *
-     * @return Lcobucci\JWT\Token
-     */
-    private function getToken(Message\ServerRequestInterface $request): Lcobucci\JWT\Token
-    {
-        $tokenString = \str_ireplace('bearer ', '', $request->getHeaderLine('Authorization'));
-        $jwtParser   = new Lcobucci\JWT\Parser();
-
-        return $jwtParser->parse($tokenString);
-    }
-
-    /**
-     * @param Lcobucci\JWT\Token $token
-     * @param string             $publicKey
-     *
-     * @throws SlimBootstrap\Exception
-     */
-    private function verifyToken(Lcobucci\JWT\Token $token, string $publicKey)
-    {
-        $result = $token->verify($this->determineSigner($this->encryption), $publicKey);
-
-        if (false === $result) {
-            throw new SlimBootstrap\Exception(
-                'JWT signature invalid',
-                401,
-                Monolog\Logger::INFO
-            );
-        }
     }
 
     /**
@@ -167,31 +145,24 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
         return $encryption;
     }
 
-    /**
-     * @param Lcobucci\JWT\Token $token
-     *
-     * @throws SlimBootstrap\Exception
-     */
-    private function validateToken(Lcobucci\JWT\Token $token)
+    private function evaluateJwtContstrains(): array
     {
-        $data = new Lcobucci\JWT\ValidationData();
+        $constrains = [];
 
-        foreach ($this->claimsConfig as $claim => $value) {
-            $function = \sprintf('set%s', \ucfirst($claim));
-
-            if (true === \method_exists($data, $function)) {
-                $data->$function($value);
-            }
+        if (
+            true === array_key_exists('audience', $this->claimsConfig)
+            && false === empty($this->claimsConfig['audience'])
+        ) {
+            $constrains[] = new Lcobucci\JWT\Validation\Constraint\PermittedFor($this->claimsConfig['audience']);
         }
 
-        $result = $token->validate($data);
-
-        if (false === $result) {
-            throw new SlimBootstrap\Exception(
-                'JWT validation failed',
-                401,
-                Monolog\Logger::INFO
-            );
+        if (
+            true === array_key_exists('issuer', $this->claimsConfig)
+            && false === empty($this->claimsConfig['issuer'])
+        ) {
+            $constrains[] = new Lcobucci\JWT\Validation\Constraint\IssuedBy($this->claimsConfig['issuer']);
         }
+
+        return $constrains;
     }
 }
