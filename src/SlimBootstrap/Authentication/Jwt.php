@@ -35,11 +35,6 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
     private $logger = null;
 
     /**
-     * @var Lcobucci\JWT\Configuration
-     */
-    private $jwtConfig = null;
-
-    /**
      * @param string         $publicKey
      * @param string         $encryption
      * @param array          $clientDataClaims
@@ -58,13 +53,6 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
         $this->clientDataClaims = $clientDataClaims;
         $this->claimsConfig     = $claimsConfig;
         $this->logger           = $logger;
-
-        $this->jwtConfig = Lcobucci\JWT\Configuration::forAsymmetricSigner(
-            $this->determineSigner($this->encryption),
-            Lcobucci\JWT\Signer\Key\InMemory::plainText(''), // setting signKey empty, as we only verify tokens here
-            Lcobucci\JWT\Signer\Key\InMemory::plainText($publicKey)
-        );
-        $this->jwtConfig->setValidationConstraints(...$this->evaluateJwtContstrains());
     }
 
     /**
@@ -76,12 +64,21 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
      */
     public function authenticate(Message\ServerRequestInterface $request): array
     {
-        try {
-            $token = $this->getToken($request);
+        $jwtConfig = Lcobucci\JWT\Configuration::forAsymmetricSigner(
+            $this->determineSigner($this->encryption),
+            Lcobucci\JWT\Signer\Key\InMemory::plainText(''), // setting signKey empty, as we only verify tokens here
+            Lcobucci\JWT\Signer\Key\InMemory::plainText($this->getPublicKey())
+        );
+        $jwtConfig->setValidationConstraints(...$this->evaluateJwtContstrains());
 
-            $this->jwtConfig->validator()->assert(
+        try {
+            $tokenString = \str_ireplace('bearer ', '', $request->getHeaderLine('Authorization'));
+            $token       = $jwtConfig->parser()->parse($tokenString);
+
+
+            $jwtConfig->validator()->assert(
                 $token,
-                ...$this->jwtConfig->validationConstraints()
+                ...$jwtConfig->validationConstraints()
             );
 
             return [
@@ -103,17 +100,6 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
     protected function getPublicKey(): string
     {
         return $this->publicKey;
-    }
-
-    /**
-     * @param Message\ServerRequestInterface $request
-     *
-     * @return Lcobucci\JWT\Token
-     */
-    private function getToken(Message\ServerRequestInterface $request): Lcobucci\JWT\Token
-    {
-        $tokenString = \str_ireplace('bearer ', '', $request->getHeaderLine('Authorization'));
-        return $this->jwtConfig->parser()->parse($tokenString);
     }
 
     /**
