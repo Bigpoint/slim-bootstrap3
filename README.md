@@ -211,7 +211,8 @@ found. The default is "entity_id".
 ### JWT
 You have to add the JWT as an authorization bearer header to the request of the API. The framework will verify and
 validate the JWT with the public key from the JWT provider provided in `jwt.publicKey`. For the validation all fields
-from the config's `jwt.claims` block have to match with the JWT.
+from the config's `jwt.claims` block have to match with the JWT. The token fields `iat` (issued at), `nbf` (not valid before) and `exp` (expiration time) are
+validated by default.
 
 After that the framework will extract the clientId from the claim "name" and the role from the "role" claim. Next the
 collected clientId and role are going to be validated against requested endpoint and configured ACL. If all is fine,

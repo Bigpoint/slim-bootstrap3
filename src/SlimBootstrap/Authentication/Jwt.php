@@ -147,7 +147,9 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
 
     private function evaluateJwtContstrains(): array
     {
-        $constrains = [];
+        $constrains = [
+            new Lcobucci\JWT\Validation\Constraint\ValidAt(Lcobucci\Clock\SystemClock::fromUTC()),
+        ];
 
         if (
             true === array_key_exists('audience', $this->claimsConfig)

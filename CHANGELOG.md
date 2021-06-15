@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.3
+- added missing jwt token time validations. This is only an issue since version `2.0.2` as the usage of Lcobucci\JWT was changed there.
+
 ## 2.0.2
 - adjusted JWT auth to avoid deprecated warnings with Lcobucci\JWT >3.4
 
