@@ -17,8 +17,8 @@
   "require": {
     "php": ">=7.0",
     "ext-json": "*",
-    "bigpoint/http-caller-php": "1.*",
-    "monolog/monolog": "1.*",
+    "bigpoint/http-caller-php": "2.*",
+    "monolog/monolog": "3.*",
     "slim/http-cache": "0.*",
     "slim/slim": "3.*"
   },
@@ -29,8 +29,8 @@
   },
   "require-dev": {
     "ext-gmp": "*",
-    "lcobucci/jwt": "^3.4.0",
-    "mdanter/ecc": "0.3.*",
+    "lcobucci/jwt": "5.*",
+    "mdanter/ecc": "1.*",
     "phpunit/phpunit": "5.*"
   },
   "conflict": {
