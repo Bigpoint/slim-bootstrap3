@@ -93,7 +93,7 @@ class Authentication implements SlimBootstrap\Middleware
 
             $authenticationMethod = \get_class($this->authentication);
 
-            $this->logger->addInfo(
+            $this->logger->info(
                 'authentication-usage',
                 [
                     'method' => $authenticationMethod,
@@ -104,7 +104,7 @@ class Authentication implements SlimBootstrap\Middleware
             $clientId   = $clientData['clientId'];
             $routeName  = $currentRoute->getName();
 
-            $this->logger->addInfo(
+            $this->logger->info(
                 'authentication-successfull',
                 [
                     'method'     => $authenticationMethod,
@@ -120,12 +120,12 @@ class Authentication implements SlimBootstrap\Middleware
                 $this->acl->access($clientId, $routeName);
             }
 
-            $this->logger->addInfo('access granted');
+            $this->logger->info('access granted');
 
             $request = $request->withAttribute('clientId', $clientId);
 
-            $this->logger->addNotice('set clientId to parameter: ' . $clientId);
-            $this->logger->addDebug(\var_export($request->getQueryParams(), true));
+            $this->logger->notice('set clientId to parameter: ' . $clientId);
+            $this->logger->debug(\var_export($request->getQueryParams(), true));
         }
 
         return $next($request, $response);
