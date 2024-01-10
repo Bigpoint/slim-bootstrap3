@@ -30,6 +30,7 @@
   "require-dev": {
     "ext-gmp": "*",
     "lcobucci/jwt": "5.*",
+    "lcobucci/clock": "3.*",
     "mdanter/ecc": "1.*",
     "phpunit/phpunit": "5.*"
   },
