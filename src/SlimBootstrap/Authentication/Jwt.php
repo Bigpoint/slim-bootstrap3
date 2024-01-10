@@ -66,7 +66,7 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
     {
         $jwtConfig = Lcobucci\JWT\Configuration::forAsymmetricSigner(
             $this->determineSigner($this->encryption),
-            Lcobucci\JWT\Signer\Key\InMemory::plainText(''), // setting signKey empty, as we only verify tokens here
+            Lcobucci\JWT\Signer\Key\InMemory::plainText($this->getPublicKey()), // setting signKey empty, as we only verify tokens here
             Lcobucci\JWT\Signer\Key\InMemory::plainText($this->getPublicKey())
         );
         $jwtConfig->setValidationConstraints(...$this->evaluateJwtContstrains());
@@ -86,7 +86,7 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
                 'role'     => $token->claims()->get($this->clientDataClaims['role']),
             ];
         } catch (\Throwable $exception) {
-            $this->logger->addWarning($exception->getMessage());
+            $this->logger->warning($exception->getMessage());
 
             throw new SlimBootstrap\Exception('JWT invalid', 401, Monolog\Logger::INFO);
         }
@@ -148,7 +148,7 @@ class Jwt implements SlimBootstrap\AuthenticationInterface
     private function evaluateJwtContstrains(): array
     {
         $constrains = [
-            new Lcobucci\JWT\Validation\Constraint\ValidAt(Lcobucci\Clock\SystemClock::fromUTC()),
+            new Lcobucci\JWT\Validation\Constraint\LooseValidAt(Lcobucci\Clock\SystemClock::fromUTC()),
         ];
 
         if (
